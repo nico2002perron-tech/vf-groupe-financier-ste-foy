@@ -48,7 +48,21 @@
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--text);
-            background: var(--white);
+            background: linear-gradient(180deg,
+                    #ffffff 0%,
+                    #f3f6fa 8%,
+                    #e8f1f8 16%,
+                    #daeef8 24%,
+                    #e4f0f9 32%,
+                    #eef5fb 40%,
+                    #f0f5fa 48%,
+                    #e8f1f8 56%,
+                    #dce9f3 64%,
+                    #e8f1f8 72%,
+                    #f0f5fa 80%,
+                    #f3f6fa 90%,
+                    #ffffff 100%);
+            background-attachment: fixed;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden
         }
@@ -95,7 +109,7 @@
         .mission {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(170deg, var(--white) 0%, var(--light) 20%, #daeef8 50%, var(--light) 80%, var(--white) 100%);
+            background: transparent;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -690,12 +704,18 @@
         .cham {
             position: relative;
             width: 100%;
-            height: 70px;
+            height: 80px;
             overflow: hidden;
             z-index: 50;
-            margin: 0;
+            margin: -10px 0;
             pointer-events: auto;
-            cursor: pointer
+            cursor: pointer;
+            opacity: .6;
+            transition: opacity .4s ease
+        }
+
+        .cham:hover {
+            opacity: 1
         }
 
         .cham svg {
@@ -1015,7 +1035,7 @@
         .services {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(175deg, #f8fbff 0%, #eef4fa 40%, #e4eef7 70%, #f0f5fa 100%);
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1645,11 +1665,187 @@
         .rv.d1 {
             transition-delay: .15s
         }
+
+        /* === IMMERSIVE SCROLL OVERRIDES === */
+        /* Make ALL sections transparent so body gradient shows through */
+        .gradient-section,
+        .gradient-section.gradient-white-to-light,
+        .gradient-section.gradient-light-to-cyan,
+        .gradient-section.gradient-cyan-to-light,
+        .gradient-section.gradient-light-to-white,
+        .gradient-section.gradient-light,
+        .gradient-section.gradient-dark {
+            background: transparent !important;
+        }
+
+        /* Old chameleon-divider style override */
+        .chameleon-divider {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            opacity: .5;
+        }
+
+        /* Floating ambient layer that crosses section boundaries */
+        .ambient-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ambient-layer .a-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: .35;
+            will-change: transform;
+        }
+
+        .ambient-layer .a-blob.ab1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 180, 216, .08);
+            top: 10%;
+            left: -5%;
+            animation: abFloat1 30s ease-in-out infinite;
+        }
+
+        .ambient-layer .a-blob.ab2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 119, 182, .06);
+            top: 35%;
+            right: -8%;
+            animation: abFloat2 35s ease-in-out infinite -8s;
+        }
+
+        .ambient-layer .a-blob.ab3 {
+            width: 600px;
+            height: 600px;
+            background: rgba(0, 180, 216, .05);
+            top: 55%;
+            left: 20%;
+            animation: abFloat3 40s ease-in-out infinite -15s;
+        }
+
+        .ambient-layer .a-blob.ab4 {
+            width: 350px;
+            height: 350px;
+            background: rgba(144, 224, 239, .07);
+            top: 75%;
+            right: 10%;
+            animation: abFloat1 28s ease-in-out infinite -5s;
+        }
+
+        .ambient-layer .a-blob.ab5 {
+            width: 450px;
+            height: 450px;
+            background: rgba(3, 4, 94, .03);
+            top: 90%;
+            left: -10%;
+            animation: abFloat2 32s ease-in-out infinite -12s;
+        }
+
+        @keyframes abFloat1 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            25% {
+                transform: translate(60px, -40px) scale(1.15)
+            }
+
+            50% {
+                transform: translate(30px, 50px) scale(.9)
+            }
+
+            75% {
+                transform: translate(-40px, 20px) scale(1.1)
+            }
+        }
+
+        @keyframes abFloat2 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            33% {
+                transform: translate(-50px, 60px) scale(1.12)
+            }
+
+            66% {
+                transform: translate(40px, -30px) scale(.95)
+            }
+        }
+
+        @keyframes abFloat3 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            50% {
+                transform: translate(-30px, -50px) scale(1.08)
+            }
+        }
+
+        /* Ensure all sections sit above ambient layer */
+        section,
+        header,
+        .cham,
+        .chameleon-divider,
+        .floating-cta,
+        footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Subtle grid overlay for depth (like Kraken) */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(0, 180, 216, .012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 180, 216, .012) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        /* Soft section connectors — subtle glow between sections */
+        section::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 10%;
+            right: 10%;
+            height: 60px;
+            background: radial-gradient(ellipse at center, rgba(0, 180, 216, .04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
     </style>
+
 </head>
 
 <body>
 
+    <!-- Ambient floating blobs (cross-section visual continuity) -->
+    <div class="ambient-layer" aria-hidden="true">
+        <div class="a-blob ab1"></div>
+        <div class="a-blob ab2"></div>
+        <div class="a-blob ab3"></div>
+        <div class="a-blob ab4"></div>
+        <div class="a-blob ab5"></div>
+    </div>
 
     <!-- Navigation -->
     <nav class="navbar" id="main-nav">
