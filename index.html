@@ -1926,7 +1926,45 @@
                 margin: 0 12px;
             }
         }
+
+        /* === CYCLE CARDS — WHITE OVERRIDE === */
+        .cycle-detail-col {
+            background: #ffffff !important;
+            animation: none !important;
+        }
+
+        .cycle-detail-col::before,
+        .cycle-detail-col::after {
+            display: none !important;
+        }
+
+        .alloc-section {
+            background: rgba(243, 246, 250, .6) !important;
+        }
+
+        .alloc-track {
+            background: rgba(0, 0, 0, .06) !important;
+        }
+
+        .disclaimer-box,
+        .disclaimer {
+            background: rgba(243, 246, 250, .5) !important;
+        }
+
+        .volatility-badges {
+            background: transparent !important;
+        }
+
+        .volatility-badge {
+            background: rgba(243, 246, 250, .7) !important;
+            border: 1px solid rgba(0, 119, 182, .08) !important;
+        }
+
+        .cta-simulate {
+            background: linear-gradient(135deg, #0077b6, #00b4d8) !important;
+        }
     </style>
+
 
 
 </head>
