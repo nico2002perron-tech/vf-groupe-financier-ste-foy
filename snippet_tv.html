@@ -1,0 +1,90 @@
+<!-- TradingView Double Ticker -->
+<div class="tv-ticker-wrapper" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
+
+    <!-- Widget 1: Mag 7 (Top) -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
+            async>
+                {
+                    "symbols": [
+                        {
+                            "proName": "NASDAQ:AAPL",
+                            "title": "Apple"
+                        },
+                        {
+                            "proName": "NASDAQ:MSFT",
+                            "title": "Microsoft"
+                        },
+                        {
+                            "proName": "NASDAQ:NVDA",
+                            "title": "NVIDIA"
+                        },
+                        {
+                            "proName": "NASDAQ:GOOGL",
+                            "title": "Alphabet"
+                        },
+                        {
+                            "proName": "NASDAQ:AMZN",
+                            "title": "Amazon"
+                        },
+                        {
+                            "proName": "NASDAQ:META",
+                            "title": "Meta"
+                        },
+                        {
+                            "proName": "NASDAQ:TSLA",
+                            "title": "Tesla"
+                        }
+                    ],
+                        "showSymbolLogo": true,
+                            "isTransparent": true,
+                                "displayMode": "adaptive",
+                                    "colorTheme": "dark",
+                                        "locale": "fr"
+                }
+            </script>
+    </div>
+
+    <!-- Widget 2: Challengers (Bottom) -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js"
+            async>
+                {
+                    "symbols": [
+                        {
+                            "proName": "NASDAQ:AMD",
+                            "title": "AMD"
+                        },
+                        {
+                            "proName": "NASDAQ:NFLX",
+                            "title": "Netflix"
+                        },
+                        {
+                            "proName": "NYSE:TSM",
+                            "title": "TSMC"
+                        },
+                        {
+                            "proName": "NYSE:BRK.B",
+                            "title": "Berkshire"
+                        },
+                        {
+                            "proName": "NYSE:JPM",
+                            "title": "JPMorgan"
+                        },
+                        {
+                            "proName": "NYSE:V",
+                            "title": "Visa"
+                        }
+                    ],
+                        "showSymbolLogo": true,
+                            "isTransparent": true,
+                                "displayMode": "adaptive",
+                                    "colorTheme": "dark",
+                                        "locale": "fr"
+                }
+            </script>
+    </div>
+
+</div>

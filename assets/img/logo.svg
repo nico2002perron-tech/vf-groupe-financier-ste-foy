@@ -1,0 +1,37 @@
+<<<<<<< HEAD
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 70">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+    </style>
+  </defs>
+  <!-- Background for visibility in preview (optional, remove for transparent) -->
+  <!-- <rect width="100%" height="100%" fill="#f0f4f8"/> -->
+  
+  <!-- Icon / Monogram -->
+  <rect x="10" y="10" width="50" height="50" rx="4" fill="#102a43" />
+  <text x="35" y="45" font-family="Arial, sans-serif" font-weight="bold" font-size="28" fill="#c5a365" text-anchor="middle">GF</text>
+  
+  <!-- Text -->
+  <text x="80" y="35" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="#102a43">GROUPE FINANCIER</text>
+  <text x="80" y="58" font-family="Arial, sans-serif" font-weight="normal" font-size="16" fill="#c5a365" letter-spacing="3">STE-FOY</text>
+</svg>
+=======
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 70">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+    </style>
+  </defs>
+  <!-- Background for visibility in preview (optional, remove for transparent) -->
+  <!-- <rect width="100%" height="100%" fill="#f0f4f8"/> -->
+  
+  <!-- Icon / Monogram -->
+  <rect x="10" y="10" width="50" height="50" rx="4" fill="#102a43" />
+  <text x="35" y="45" font-family="Arial, sans-serif" font-weight="bold" font-size="28" fill="#c5a365" text-anchor="middle">GF</text>
+  
+  <!-- Text -->
+  <text x="80" y="35" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="#102a43">GROUPE FINANCIER</text>
+  <text x="80" y="58" font-family="Arial, sans-serif" font-weight="normal" font-size="16" fill="#c5a365" letter-spacing="3">STE-FOY</text>
+</svg>
+>>>>>>> 507e2479a411d598d11a1e4fd3c923d5df27c80a

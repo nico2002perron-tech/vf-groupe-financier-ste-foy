@@ -1,0 +1,414 @@
+/* =========================================
+   MARCHÉS V2 — ÉDUCATIF + PREMIUM
+   Dashboard · TradingView · Glass
+   ========================================= */
+
+/* ── Section ── */
+.marches-v2 {
+    position: relative;
+    background: linear-gradient(180deg, #f0f7fc 0%, #e6f0fa 40%, #f0f7fc 100%);
+    overflow: hidden;
+}
+
+/* ── Header ── */
+.marches-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.marches-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.marches-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 119, 182, 0.06);
+    border: 1px solid rgba(0, 119, 182, 0.12);
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0077b6;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: livePulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(239, 68, 68, 0);
+    }
+}
+
+.market-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    color: #5a7d95;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot.status-open {
+    background: #10b981;
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+}
+
+.status-dot.status-closed {
+    background: #94a3b8;
+}
+
+.marches-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    color: #0a2540;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    letter-spacing: -0.03em;
+}
+
+.marches-sub {
+    font-size: 1.1rem;
+    color: #5a7d95;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ── Grid ── */
+.marches-edu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* ── Card ── */
+.market-edu-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 12px 40px rgba(0, 40, 80, 0.05),
+        0 2px 8px rgba(0, 40, 80, 0.02),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.market-edu-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 20px 52px rgba(0, 40, 80, 0.08),
+        0 4px 14px rgba(0, 40, 80, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 119, 182, 0.12);
+}
+
+/* Card Top */
+.mcard-top {
+    padding: 24px 24px 0;
+}
+
+.mcard-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.mcard-flag {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.mcard-title-group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mcard-title-group h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0a2540;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.mcard-symbol {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, #0077b6, #00b4d8);
+    padding: 3px 9px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* TradingView Chart Wrapper */
+.mcard-chart-wrap {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 40, 80, 0.02);
+    position: relative;
+}
+
+.mcard-chart-wrap .tradingview-widget-container {
+    width: 100%;
+    height: 100%;
+}
+
+/* Card Bottom — Educational */
+.mcard-bottom {
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    border-top: 1px solid rgba(0, 119, 182, 0.04);
+}
+
+.mcard-desc {
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #5a7d95;
+    margin: 0;
+}
+
+/* Holdings */
+.mcard-holdings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.holdings-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #0a2540;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.holdings-title i,
+.holdings-title svg {
+    color: #0077b6;
+}
+
+.holdings-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.holding-chip {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #3a5a6e;
+    background: rgba(0, 119, 182, 0.04);
+    border: 1px solid rgba(0, 119, 182, 0.06);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.holding-chip:hover {
+    background: rgba(0, 119, 182, 0.08);
+    border-color: rgba(0, 119, 182, 0.12);
+}
+
+/* Sector Chips */
+.mcard-sectors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sector-chip {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.sector-chip.sector-tech {
+    background: rgba(99, 102, 241, 0.08);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.sector-chip.sector-finance {
+    background: rgba(0, 119, 182, 0.08);
+    color: #0077b6;
+    border: 1px solid rgba(0, 119, 182, 0.1);
+}
+
+.sector-chip.sector-health {
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.sector-chip.sector-energy {
+    background: rgba(245, 158, 11, 0.08);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.sector-chip.sector-industry {
+    background: rgba(107, 114, 128, 0.08);
+    color: #4b5563;
+    border: 1px solid rgba(107, 114, 128, 0.1);
+}
+
+.sector-chip.sector-consumer {
+    background: rgba(236, 72, 153, 0.08);
+    color: #db2777;
+    border: 1px solid rgba(236, 72, 153, 0.1);
+}
+
+.sector-chip.sector-commodity {
+    background: rgba(217, 119, 6, 0.08);
+    color: #b45309;
+    border: 1px solid rgba(217, 119, 6, 0.1);
+}
+
+.sector-chip.sector-safe {
+    background: rgba(234, 179, 8, 0.08);
+    color: #a16207;
+    border: 1px solid rgba(234, 179, 8, 0.1);
+}
+
+/* Source */
+.mcard-source {
+    font-size: 0.62rem;
+    color: #a0b4c4;
+    margin-top: auto;
+}
+
+/* ── Global Disclaimer ── */
+.marches-disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 119, 182, 0.05);
+    border-radius: 12px;
+    font-size: 0.72rem;
+    color: #8ba3b5;
+    line-height: 1.6;
+}
+
+.marches-disclaimer i,
+.marches-disclaimer svg {
+    color: #0077b6;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1100px) {
+    .marches-edu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .marches-edu-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .marches-header {
+        margin-bottom: 32px;
+    }
+
+    .marches-title {
+        font-size: 1.6rem;
+    }
+
+    .marches-sub {
+        font-size: 0.92rem;
+    }
+
+    .mcard-top {
+        padding: 18px 18px 0;
+    }
+
+    .mcard-bottom {
+        padding: 16px 18px 20px;
+    }
+
+    .mcard-chart-wrap {
+        height: 170px;
+    }
+
+    .mcard-title-group h3 {
+        font-size: 1rem;
+    }
+
+    .marches-badge-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 380px) {
+    .marches-title {
+        font-size: 1.4rem;
+    }
+
+    .mcard-chart-wrap {
+        height: 150px;
+    }
+}

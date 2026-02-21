@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groupe Financier Ste-Foy | Planification & Gestion de Patrimoine</title>
+    <!-- Fonts: Montserrat (Titres) & Open Sans (Corps) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/ai-radar.css">
+    <link rel="stylesheet" href="./css/hero-v2.css">
+    <link rel="stylesheet" href="./css/navbar.css">
+
+    <link rel="stylesheet" href="./css/cycle-v4.css">
+    <link rel="stylesheet" href="./css/compas.css">
+    <link rel="stylesheet" href="./css/marches-v2.css">
+    <link rel="stylesheet" href="./css/conversion.css">
+</head>
+
+<body>
+
+
+    <!-- Navigation -->
+    <nav class="navbar" id="main-nav">
+        <div class="container nav-container">
+            <a href="#" class="logo-link">
+                <img src="./assets/logo.png" alt="Groupe Financier Ste-Foy" class="logo-img">
+            </a>
+
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#cycle-economique" class="nav-highlight-strategy"><i data-lucide="activity"></i> Notre
+                    Stratégie</a>
+                <a href="#marches">Marchés</a>
+                <a href="#conseils" class="nav-highlight"><i data-lucide="sparkles"></i> Actualités I.A.</a>
+                <a href="#equipe">Équipe</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contact" class="btn-nav-outline">Nous Joindre</a>
+                <a href="https://login.service.client.iagestionprivee.ca" target="_blank" class="btn-nav"><i
+                        data-lucide="lock"></i>
+                    Portail Client</a>
+            </div>
+
+            <button class="menu-toggle" aria-label="Menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <button class="menu-close"><i data-lucide="x"></i></button>
+        <a href="#services">Services</a>
+        <a href="#cycle-economique"><i data-lucide="activity"></i> Notre Stratégie</a>
+        <a href="#marches">Marchés</a>
+        <a href="#conseils"><i data-lucide="sparkles"></i> Actualités I.A.</a>
+        <a href="#equipe">Équipe</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Nous Joindre</a>
+        <a href="https://groupefinancier.ca/portail" target="_blank">Portail Client</a>
+    </div>
+
+    <!-- ============ HERO ============ -->
+    <header class="hero-v2">
+        <!-- Glow border -->
+        <div class="hero-glow-border"></div>
+
+        <!-- Video BG Carousel -->
+        <div class="hero-video-wrap">
+            <video autoplay muted loop playsinline class="hero-video hero-vid active" id="hero-vid-1">
+                <source src="./assets/hero-bg-2.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline class="hero-video hero-vid" id="hero-vid-2">
+                <source src="./assets/hero-bg.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+        </div>
+
+        <!-- Particles -->
+        <div class="hero-particles" id="hero-particles"></div>
+
+        <!-- Main Content -->
+        <div class="container hero-content">
+            <div class="hero-left">
+                <div class="hero-badge anim-up" style="--d:.1s">
+                    <span class="badge-dot"></span>
+                    Groupe Financier Ste-Foy
+                </div>
+
+                <h1 class="hero-title anim-up" style="--d:.25s">
+                    Votre avenir financier,<br>
+                    <span class="hero-gradient-text">notre priorité absolue.</span>
+                </h1>
+
+                <p class="hero-sub anim-up" style="--d:.4s">Depuis plusieurs années, nous accompagnons les familles et
+                    les entreprises de Québec avec intégrité, transparence et une expertise reconnue.</p>
+
+                <div class="hero-ctas anim-up" style="--d:.55s">
+                    <a href="#contact" class="hero-btn-primary">
+                        <i data-lucide="calendar"></i>
+                        Prendre Rendez-vous
+                    </a>
+                    <a href="#services" class="hero-btn-ghost">
+                        Nos services
+                        <i data-lucide="arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="hero-trust anim-up" style="--d:.7s">
+                    <div class="trust-item">
+                        <i data-lucide="award"></i>
+                        <span><strong>25+</strong> ans</span>
+                    </div>
+                    <div class="trust-divider"></div>
+                    <div class="trust-item">
+                        <i data-lucide="users"></i>
+                        <span><strong>500+</strong> familles</span>
+                    </div>
+                    <div class="trust-divider"></div>
+                    <div class="trust-item">
+                        <i data-lucide="shield-check"></i>
+                        <span><strong>100%</strong> indépendant</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right anim-up" style="--d:.45s">
+                <div class="hero-img-frame">
+                    <img src="./assets/team-photo.jpg" alt="L'équipe du Groupe Financier Ste-Foy">
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll -->
+        <a href="#mission" class="hero-scroll">
+            <span>Découvrir</span>
+            <i data-lucide="chevron-down"></i>
+        </a>
+    </header>
+
+    <!-- Notre Mission Section (Premium) -->
+    <section id="mission" class="section-padding mission-section gradient-section gradient-white-to-light">
+        <div class="container">
+            <div class="mission-header text-center fade-in-scroll">
+                <span class="section-tag"><i data-lucide="target"></i> Notre Raison d'Être</span>
+                <h2>Notre <span class="text-gradient">Mission</span></h2>
+                <p class="mission-subtitle">Accompagner nos clients avec <strong>rigueur</strong>,
+                    <strong>respect</strong> et <strong>intégrité</strong>.
+                </p>
+            </div>
+
+            <div class="mission-cards">
+                <!-- Card 1 -->
+                <div class="mission-card fade-in-scroll">
+                    <div class="mission-icon">
+                        <i data-lucide="puzzle"></i>
+                    </div>
+                    <h4>Stratégies personnalisées</h4>
+                    <p>Des solutions financières <span class="highlight">sur mesure</span>, adaptées à vos objectifs et
+                        <span class="highlight">durables</span> dans le temps.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="mission-card fade-in-scroll delay-1">
+                    <div class="mission-icon">
+                        <i data-lucide="headphones"></i>
+                    </div>
+                    <h4>Écoute et suivi</h4>
+                    <p>Au-delà des produits, nous priorisons l'<span class="highlight">écoute attentive</span> et un
+                        <span class="highlight">accompagnement continu</span>.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="mission-card fade-in-scroll delay-2">
+                    <div class="mission-icon">
+                        <i data-lucide="scale"></i>
+                    </div>
+                    <h4>Conseils impartiaux</h4>
+                    <p>Des recommandations <span class="highlight">objectives</span>, centrées uniquement sur <span
+                            class="highlight">vos intérêts</span>.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="mission-card fade-in-scroll">
+                    <div class="mission-icon">
+                        <i data-lucide="eye"></i>
+                    </div>
+                    <h4>Transparence</h4>
+                    <p>Une approche <span class="highlight">claire et accessible</span>, sans jargon inutile.</p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="mission-card fade-in-scroll delay-1">
+                    <div class="mission-icon">
+                        <i data-lucide="heart-handshake"></i>
+                    </div>
+                    <h4>Engagement à long terme</h4>
+                    <p>Notre vision : être votre <span class="highlight">référence locale</span> en services financiers.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mission-cta text-center fade-in-scroll">
+                <a href="#equipe" class="btn-primary"><i data-lucide="users"></i> Rencontrer l'équipe</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vapor Fog Divider -->
+    <div class="chameleon-divider" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">
+        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="vapor-gradient-1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#b8d4e8">
+                        <animate attributeName="stop-color" values="#b8d4e8;#5fa8d3;#0077b6;#b8d4e8" dur="15s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="50%" style="stop-color:#5fa8d3">
+                        <animate attributeName="stop-color" values="#5fa8d3;#0077b6;#b8d4e8;#5fa8d3" dur="15s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="100%" style="stop-color:#0077b6">
+                        <animate attributeName="stop-color" values="#0077b6;#b8d4e8;#5fa8d3;#0077b6" dur="15s"
+                            repeatCount="indefinite" />
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-1)"
+                fill="none" stroke-width="8" />
+            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-1)"
+                fill="none" stroke-width="6" />
+            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-1)"
+                fill="none" stroke-width="4" />
+        </svg>
+        <!-- Floating particles -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <!-- Left side particles -->
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <!-- Right side particles -->
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+        </div>
+        <!-- Scroll indicator -->
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <section id="services" class="section-padding gradient-section gradient-light">
+        <div class="container">
+            <div class="mission-header text-center fade-in-scroll">
+                <span class="section-tag"><i data-lucide="briefcase"></i> Nos Services</span>
+                <h2>Nos Champs <span class="text-gradient">d'Expertise</span></h2>
+                <p class="mission-subtitle">Une approche globale pour bâtir, protéger et transmettre votre patrimoine.
+                </p>
+            </div>
+
+            <div class="services-layout">
+                <!-- LEFT: Accordion List -->
+                <div class="services-accordion">
+                    <div class="accordion-item active"
+                        data-image="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80">
+                        <div class="accordion-header">
+                            <h3><span class="accordion-icon"><i data-lucide="bar-chart-3"></i></span>Portefeuille
+                                Personnalisé</h3>
+                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="accordion-body">
+                            <p>Une gestion discrétionnaire active, basée sur votre tolérance au risque et les cycles
+                                économiques, pour maximiser le rendement tout en préservant le capital.</p>
+                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="accordion-item"
+                        data-image="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80">
+                        <div class="accordion-header">
+                            <h3><span class="accordion-icon"><i data-lucide="shield-check"></i></span>Stratégies
+                                Fiscales</h3>
+                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="accordion-body">
+                            <p>Analyse approfondie de vos revenus, optimisation des comptes (REER/CELI/CRI) et
+                                structures corporatives pour minimiser l'impact fiscal.</p>
+                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="accordion-item"
+                        data-image="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&q=80">
+                        <div class="accordion-header">
+                            <h3><span class="accordion-icon"><i data-lucide="landmark"></i></span>Planification
+                                Successorale</h3>
+                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="accordion-body">
+                            <p>Mise en place de fiducies, gels successoraux et transferts pour protéger vos héritiers et
+                                la pérennité de vos actifs familiaux.</p>
+                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="accordion-item"
+                        data-image="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80">
+                        <div class="accordion-header">
+                            <h3><span class="accordion-icon"><i data-lucide="sunset"></i></span>Planification de
+                                Retraite</h3>
+                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="accordion-body">
+                            <p>Projections financières, stratégies de décaissement et optimisation des rentes pour une
+                                indépendance financière durable.</p>
+                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Featured Image -->
+                <div class="services-image">
+                    <img id="services-featured-img"
+                        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+                        alt="Service Image">
+                    <a href="#contact" class="image-cta btn">Obtenez une consultation <i
+                            data-lucide="arrow-up-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vapor Fog Divider -->
+    <div class="chameleon-divider"
+        onclick="document.getElementById('cycle-economique').scrollIntoView({behavior: 'smooth'})">
+        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="vapor-gradient-2" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5fa8d3">
+                        <animate attributeName="stop-color" values="#5fa8d3;#0077b6;#b8d4e8;#5fa8d3" dur="18s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="50%" style="stop-color:#0077b6">
+                        <animate attributeName="stop-color" values="#0077b6;#b8d4e8;#5fa8d3;#0077b6" dur="18s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="100%" style="stop-color:#b8d4e8">
+                        <animate attributeName="stop-color" values="#b8d4e8;#5fa8d3;#0077b6;#b8d4e8" dur="18s"
+                            repeatCount="indefinite" />
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-2)"
+                fill="none" stroke-width="8" />
+            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-2)"
+                fill="none" stroke-width="6" />
+            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-2)"
+                fill="none" stroke-width="4" />
+        </svg>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <!-- Left side particles -->
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <!-- Right side particles -->
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+        </div>
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Cycle Économique Interactive Section V5 (SHARP) -->
+    <section id="cycle-economique" class="section-padding gradient-section gradient-light-to-cyan">
+
+        <!-- Floating Decorative Orbs -->
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+
+        <div class="container" style="position: relative; z-index: 2;">
+            <!-- Sharp Section Header -->
+            <div class="cycle-header-v5 fade-in-scroll">
+                <span class="cycle-badge-v5">
+                    <span class="badge-pulse-dot"></span>
+                    Comment on gère votre argent
+                </span>
+                <h2 class="cycle-title-v5">
+                    Chaque cycle a sa
+                    <span class="cycle-gradient-word">stratégie</span>
+                </h2>
+                <p class="cycle-sub-v5">Les marchés bougent. Votre portefeuille s'adapte.</p>
+            </div>
+
+            <!-- Main Glass Card -->
+            <div class="cycle-glass fade-in-scroll delay-1">
+                <!-- Ripple effect container -->
+                <div class="cycle-ripple" id="cycle-ripple"></div>
+
+                <!-- Top glow line -->
+                <div class="cycle-glass-topline"></div>
+
+                <div class="cycle-split-layout">
+
+                    <!-- LEFT: Radar Circle -->
+                    <div class="cycle-radar-col">
+                        <div class="radar-wrapper">
+                            <div class="radar-core">
+                                <div class="radar-quadrant active" data-phase="expansion">
+                                    <div class="quadrant-content">
+                                        <div class="icon-bubble"><i data-lucide="trending-up"></i></div>
+                                        <span class="quadrant-label">Expansion</span>
+                                    </div>
+                                </div>
+
+                                <div class="radar-quadrant" data-phase="surchauffe">
+                                    <div class="quadrant-content">
+                                        <div class="icon-bubble warning"><i data-lucide="flame"></i></div>
+                                        <span class="quadrant-label">Surchauffe</span>
+                                    </div>
+                                </div>
+
+                                <div class="radar-quadrant" data-phase="recession">
+                                    <div class="quadrant-content">
+                                        <div class="icon-bubble dark"><i data-lucide="shield"></i></div>
+                                        <span class="quadrant-label">Récession</span>
+                                    </div>
+                                </div>
+
+                                <div class="radar-quadrant" data-phase="reprise">
+                                    <div class="quadrant-content">
+                                        <div class="icon-bubble success"><i data-lucide="sunrise"></i></div>
+                                        <span class="quadrant-label">Reprise</span>
+                                    </div>
+                                </div>
+
+                                <div class="radar-center-glass">
+                                    <div class="center-content">
+                                        <h3 id="cycle-title" class="text-gradient-expansion">Expansion</h3>
+                                        <p id="cycle-desc-mini">Cliquez une phase</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Detail Panel -->
+                    <div class="cycle-detail-col" id="cycle-detail-panel">
+
+                        <div class="phase-header" id="phase-header">
+                            <div class="phase-icon-wrap" id="phase-icon-wrap">
+                                <i data-lucide="trending-up"></i>
+                            </div>
+                            <div class="phase-title-group">
+                                <h3 class="phase-name" id="phase-name">Expansion</h3>
+                                <span class="phase-strategy" id="phase-strategy">Stratégie : croissance contrôlée</span>
+                            </div>
+                        </div>
+
+                        <p class="phase-description" id="phase-description">
+                            Les marchés progressent, l'économie croît et la confiance est élevée. Nous maximisons
+                            l'exposition aux actions tout en surveillant les signaux d'inflation pour anticiper les
+                            retournements.
+                        </p>
+
+                        <div class="alloc-section">
+                            <div class="alloc-title">
+                                <i data-lucide="pie-chart" style="width:14px;height:14px;"></i>
+                                Allocation suggérée
+                            </div>
+                            <div class="alloc-bars">
+                                <div class="alloc-row">
+                                    <div class="alloc-label">
+                                        <span class="alloc-dot alloc-dot-actions"></span>
+                                        Actions
+                                    </div>
+                                    <div class="alloc-track">
+                                        <div class="alloc-fill alloc-fill-actions" id="alloc-bar-actions"
+                                            style="width: 65%"></div>
+                                    </div>
+                                    <span class="alloc-pct" id="alloc-pct-actions">65%</span>
+                                </div>
+                                <div class="alloc-row">
+                                    <div class="alloc-label">
+                                        <span class="alloc-dot alloc-dot-obligations"></span>
+                                        Obligations
+                                    </div>
+                                    <div class="alloc-track">
+                                        <div class="alloc-fill alloc-fill-obligations" id="alloc-bar-obligations"
+                                            style="width: 20%"></div>
+                                    </div>
+                                    <span class="alloc-pct" id="alloc-pct-obligations">20%</span>
+                                </div>
+                                <div class="alloc-row">
+                                    <div class="alloc-label">
+                                        <span class="alloc-dot alloc-dot-alternatif"></span>
+                                        Alternatif
+                                    </div>
+                                    <div class="alloc-track">
+                                        <div class="alloc-fill alloc-fill-alternatif" id="alloc-bar-alternatif"
+                                            style="width: 15%"></div>
+                                    </div>
+                                    <span class="alloc-pct" id="alloc-pct-alternatif">15%</span>
+                                </div>
+                            </div>
+
+                            <!-- Smart Disclaimer -->
+                            <div class="alloc-disclaimer">
+                                <i data-lucide="info" style="width:13px;height:13px;flex-shrink:0;"></i>
+                                <span>Ces pourcentages sont des orientations générales, ajustées selon votre profil et
+                                    les conditions du marché.</span>
+                                <a href="#compas" class="disclaimer-cta" id="disclaimer-cta">Simuler avec mes données <i
+                                        data-lucide="arrow-down" style="width:12px;height:12px;"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="phase-indicators">
+                            <div class="indicator-chip" id="indicator-volatility">
+                                <i data-lucide="activity" style="width:14px;height:14px;"></i>
+                                <span>Volatilité : <strong>modérée</strong></span>
+                            </div>
+                            <div class="indicator-chip" id="indicator-horizon">
+                                <i data-lucide="clock" style="width:14px;height:14px;"></i>
+                                <span>Horizon : <strong>moyen terme</strong></span>
+                            </div>
+                        </div>
+
+                        <a href="#compas" class="cycle-to-compas-btn" id="cycle-to-compas-btn">
+                            <i data-lucide="compass" style="width:16px;height:16px;"></i>
+                            Simuler l'impact sur mon portefeuille
+                            <i data-lucide="arrow-down" style="width:14px;height:14px;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom fade for smooth transition -->
+        <div class="cycle-section-fade"></div>
+    </section>
+
+    <!-- ============ COMPAS PATRIMONIAL I.A. (V2) ============ -->
+    <section id="compas" class="compas-section">
+        <!-- Decorative orbs removed -->
+
+        <div class="container" style="position: relative; z-index: 2;">
+            <!-- Visual Connector -->
+            <div class="compas-connector fade-in-scroll">
+                <div class="connector-line"></div>
+                <div class="connector-text"><i data-lucide="arrow-down"></i> Appliquez le cycle à votre portefeuille
+                </div>
+            </div>
+
+            <!-- Header (Simplified) -->
+            <div class="compas-header fade-in-scroll">
+                <span class="compas-badge"><i data-lucide="compass"></i> Outil Interactif</span>
+                <!-- H2 Removed -->
+                <!-- P Removed -->
+            </div>
+
+            <!-- Main Glass Container -->
+            <div class="compas-glass fade-in-scroll delay-1">
+                <div class="compas-layout">
+                    <!-- LEFT: Controls -->
+                    <div class="compas-controls">
+                        <!-- Cycle Indicator (linked to radar) -->
+                        <div class="compas-cycle-indicator expansion" id="compas-cycle-indicator">
+                            <span class="cycle-dot"></span>
+                            <div class="cycle-indicator-text">
+                                <strong id="compas-cycle-name">Cycle actif : Expansion</strong>
+                                <span id="compas-cycle-desc">Phase de croissance économique soutenue</span>
+                                <span class="cycle-hint"><i data-lucide="arrow-up"></i> Cliquez pour changer le cycle
+                                    ci-dessus</span>
+                            </div>
+                        </div>
+
+                        <!-- Amount Slider -->
+                        <div class="compas-slider-group">
+                            <div class="slider-label">
+                                <span><i data-lucide="wallet" style="width:14px;height:14px;display:inline;"></i>
+                                    Montant à investir
+                                    <span class="tooltip-trigger">?<span class="tooltip-bubble">Le montant initial est
+                                            la base sur laquelle les intérêts composés travaillent. Plus il est élevé,
+                                            plus l'effet de levier est puissant sur le long terme.</span></span>
+                                </span>
+                                <span class="slider-value" id="compas-amount-value">100 000 $</span>
+                            </div>
+                            <input type="range" class="compas-range" id="compas-amount" min="10000" max="1000000"
+                                step="5000" value="100000">
+                        </div>
+
+                        <!-- Horizon Slider -->
+                        <div class="compas-slider-group">
+                            <div class="slider-label">
+                                <span><i data-lucide="hourglass" style="width:14px;height:14px;display:inline;"></i>
+                                    Horizon de placement
+                                    <span class="tooltip-trigger">?<span class="tooltip-bubble">L'horizon est souvent
+                                            plus important que le montant. 10 ans de plus peuvent doubler votre
+                                            projection grâce à l'effet des intérêts composés.</span></span>
+                                </span>
+                                <span class="slider-value" id="compas-horizon-value">15 ans</span>
+                            </div>
+                            <input type="range" class="compas-range" id="compas-horizon" min="3" max="30" step="1"
+                                value="15">
+                        </div>
+
+                        <!-- Risk Profile -->
+                        <div class="compas-profile-group">
+                            <div class="slider-label">
+                                <span><i data-lucide="shield-check" style="width:14px;height:14px;display:inline;"></i>
+                                    Profil de risque
+                                    <span class="tooltip-trigger">?<span class="tooltip-bubble">Votre profil détermine
+                                            le ratio actions/obligations. Un profil Croissance vise plus haut mais
+                                            accepte plus de turbulence en cours de route.</span></span>
+                                </span>
+                            </div>
+                            <div class="profile-buttons">
+                                <button class="profile-btn" data-profile="prudent"><i data-lucide="shield"></i>
+                                    Prudent</button>
+                                <button class="profile-btn active" data-profile="equilibre"><i data-lucide="scale"></i>
+                                    Équilibré</button>
+                                <button class="profile-btn" data-profile="croissance"><i data-lucide="trending-up"></i>
+                                    Croissance</button>
+                            </div>
+                        </div>
+
+                        <!-- Discover Profile Button (V2) -->
+                        <button class="compas-discover-btn" id="compas-discover-btn">
+                            <i data-lucide="help-circle"></i>
+                            Quel est mon profil de risque?
+                        </button>
+
+                        <!-- CTA -->
+                        <a href="#contact" class="compas-cta">
+                            <i data-lucide="calendar"></i>
+                            Discuter avec un expert
+                        </a>
+                    </div>
+
+                    <!-- RIGHT: Results -->
+                    <div class="compas-results">
+                        <!-- Projection Chart -->
+                        <div class="compas-projection">
+                            <div class="projection-header">
+                                <h3><i data-lucide="trending-up"></i> Projection de croissance</h3>
+                                <div class="projection-final">
+                                    <div class="big-number" id="compas-big-number">243 685 $</div>
+                                    <div class="subtitle" id="compas-subtitle">Projection sur 15 ans</div>
+                                </div>
+                            </div>
+                            <div class="compas-chart-wrap">
+                                <svg id="compas-svg-chart" viewBox="0 0 600 180" preserveAspectRatio="none"></svg>
+                            </div>
+                        </div>
+
+                        <!-- AI Analysis -->
+                        <div class="compas-ai-box">
+                            <div class="ai-box-header">
+                                <div class="ai-icon-ring">
+                                    <i data-lucide="bot"></i>
+                                </div>
+                                <div>
+                                    <div class="ai-box-title">Analyse du Compas I.A.</div>
+                                    <div class="ai-box-subtitle">Recommandation basée sur le cycle actuel</div>
+                                </div>
+                            </div>
+                            <div id="compas-ai-text">
+                                <span class="ai-emoji">📈</span> <strong>Profil équilibré identifié.</strong> En phase
+                                d'<strong>Expansion</strong>, les marchés offrent un terrain favorable. Ajustez les
+                                paramètres ci-dessus pour obtenir une analyse personnalisée.
+                            </div>
+                        </div>
+
+                        <!-- Stats Row -->
+                        <div class="compas-stats">
+                            <div class="compas-stat">
+                                <div class="stat-value" id="stat-gain">143 685 $</div>
+                                <div class="stat-label">Gain projeté</div>
+                            </div>
+                            <div class="compas-stat">
+                                <div class="stat-value" id="stat-return">7.5%</div>
+                                <div class="stat-label">Rendement annuel</div>
+                            </div>
+                            <div class="compas-stat">
+                                <div class="stat-value" id="stat-alloc">65% Actions</div>
+                                <div class="stat-label">Allocation suggérée</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="compas-disclaimer">
+                    <i data-lucide="info"></i>
+                    Simulation à titre indicatif seulement. Les rendements passés ne garantissent pas les rendements
+                    futurs.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+     COMPOSANTE 2 : CTA APRÈS LE COMPAS
+     ============================================ -->
+    <section class="post-compas-cta" id="post-compas-cta">
+        <div class="container">
+            <div class="cta-card fade-in-scroll">
+                <div class="cta-card-glow"></div>
+                <div class="cta-card-content">
+                    <div class="cta-left">
+                        <div class="cta-icon-ring">
+                            <i data-lucide="handshake"></i>
+                        </div>
+                        <div class="cta-text">
+                            <h3>Vous aimez ce que vous voyez?</h3>
+                            <p>Un de nos conseillers peut bâtir cette stratégie <strong>personnalisée</strong> pour
+                                vous. Première consultation <strong>gratuite</strong>, sans obligation.</p>
+                        </div>
+                    </div>
+                    <div class="cta-right">
+                        <a href="tel:4185772087" class="cta-action-btn cta-phone-btn">
+                            <i data-lucide="phone" style="width:18px;height:18px;"></i>
+                            418-577-2087
+                        </a>
+                        <a href="#contact-form-section" class="cta-action-btn cta-form-btn">
+                            <i data-lucide="calendar" style="width:18px;height:18px;"></i>
+                            Prendre rendez-vous
+                        </a>
+                    </div>
+                </div>
+                <div class="cta-trust-row">
+                    <span><i data-lucide="shield-check" style="width:14px;height:14px;"></i> Sans frais</span>
+                    <span><i data-lucide="clock" style="width:14px;height:14px;"></i> 30 minutes</span>
+                    <span><i data-lucide="lock" style="width:14px;height:14px;"></i> Confidentiel</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ QUIZ MODAL (V2) ============ -->
+    <div class="quiz-overlay" id="quiz-overlay">
+        <div class="quiz-modal">
+            <button class="quiz-close" id="quiz-close"><i data-lucide="x"></i></button>
+
+            <!-- Progress -->
+            <div class="quiz-progress">
+                <div class="progress-info">
+                    <span id="quiz-progress-text">Question 1 / 5</span>
+                    <span>Profil de risque</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quiz-progress-fill" style="width:20%"></div>
+                </div>
+            </div>
+
+            <!-- Q1 -->
+            <div class="quiz-card active" data-question="0">
+                <h3>Quel est votre objectif principal?</h3>
+                <p class="quiz-subtitle">Choisissez ce qui vous représente le mieux.</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-score="1"><span class="option-emoji">🛡️</span> Protéger ce que j'ai
+                    </div>
+                    <div class="quiz-option" data-score="1"><span class="option-emoji">🏠</span> Acheter une maison
+                    </div>
+                    <div class="quiz-option" data-score="2"><span class="option-emoji">🏖️</span> Préparer ma retraite
+                    </div>
+                    <div class="quiz-option" data-score="3"><span class="option-emoji">📈</span> Faire croître mon
+                        capital</div>
+                </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="quiz-card" data-question="1">
+                <h3>Que feriez-vous si vos placements perdaient 20% en un mois?</h3>
+                <p class="quiz-subtitle">Soyez honnête, il n'y a pas de mauvaise réponse.</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-score="1"><span class="option-emoji">😰</span> Je vends tout
+                        immédiatement</div>
+                    <div class="quiz-option" data-score="2"><span class="option-emoji">⏳</span> J'attends sans rien
+                        faire</div>
+                    <div class="quiz-option" data-score="3"><span class="option-emoji">💪</span> J'investis davantage,
+                        c'est une opportunité</div>
+                </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="quiz-card" data-question="2">
+                <h3>Quel est votre horizon de temps?</h3>
+                <p class="quiz-subtitle">Quand aurez-vous besoin de cet argent?</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-score="1"><span class="option-emoji">⏱️</span> Moins de 3 ans</div>
+                    <div class="quiz-option" data-score="2"><span class="option-emoji">📅</span> 3 à 10 ans</div>
+                    <div class="quiz-option" data-score="2"><span class="option-emoji">🗓️</span> 10 à 20 ans</div>
+                    <div class="quiz-option" data-score="3"><span class="option-emoji">♾️</span> Plus de 20 ans</div>
+                </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="quiz-card" data-question="3">
+                <h3>Comment décririez-vous vos connaissances financières?</h3>
+                <p class="quiz-subtitle">Votre expérience avec les investissements.</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-score="1"><span class="option-emoji">🌱</span> Débutant — je commence
+                        à peine</div>
+                    <div class="quiz-option" data-score="2"><span class="option-emoji">📊</span> Intermédiaire — je
+                        connais les bases</div>
+                    <div class="quiz-option" data-score="3"><span class="option-emoji">🎯</span> Avancé — je suis très à
+                        l'aise</div>
+                </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="quiz-card" data-question="4">
+                <h3>Quelle part de votre épargne êtes-vous prêt à investir?</h3>
+                <p class="quiz-subtitle">Le montant que vous pouvez placer à long terme.</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-score="1"><span class="option-emoji">💧</span> Moins de 25%</div>
+                    <div class="quiz-option" data-score="2"><span class="option-emoji">🌊</span> Entre 25% et 50%</div>
+                    <div class="quiz-option" data-score="3"><span class="option-emoji">🌊</span> Plus de 50%</div>
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="quiz-result" id="quiz-result">
+                <div class="result-icon" id="quiz-result-icon">⚖️</div>
+                <h3>Votre profil a été identifié!</h3>
+                <div class="result-profile" id="quiz-result-profile">Profil Équilibré</div>
+                <p id="quiz-result-desc">Vous recherchez un juste milieu entre croissance et sécurité.</p>
+                <button class="quiz-apply-btn" id="quiz-apply-btn">
+                    <i data-lucide="check-circle"></i>
+                    Appliquer à mon Compas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vapor Fog Divider -->
+    <div class="chameleon-divider" onclick="document.getElementById('marches').scrollIntoView({behavior: 'smooth'})">
+        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="vapor-gradient-3" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#0077b6">
+                        <animate attributeName="stop-color" values="#0077b6;#b8d4e8;#5fa8d3;#0077b6" dur="20s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="50%" style="stop-color:#b8d4e8">
+                        <animate attributeName="stop-color" values="#b8d4e8;#5fa8d3;#0077b6;#b8d4e8" dur="20s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="100%" style="stop-color:#5fa8d3">
+                        <animate attributeName="stop-color" values="#5fa8d3;#0077b6;#b8d4e8;#5fa8d3" dur="20s"
+                            repeatCount="indefinite" />
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-3)"
+                fill="none" stroke-width="8" />
+            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-3)"
+                fill="none" stroke-width="6" />
+            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-3)"
+                fill="none" stroke-width="4" />
+        </svg>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <!-- Left side particles -->
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <!-- Right side particles -->
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+        </div>
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Live Markets Section -->
+    <!-- Live Markets Section (Header Only) -->
+    <!-- ============ MARCHÉS EN TEMPS RÉEL V2 — ÉDUCATIF ============ -->
+    <section id="marches" class="section-padding marches-v2">
+
+        <div class="container">
+            <!-- Header -->
+            <div class="marches-header fade-in-scroll">
+                <div class="marches-badge-row">
+                    <span class="marches-badge">
+                        <span class="live-dot"></span>
+                        Marchés mondiaux
+                    </span>
+                    <span class="market-status" id="market-status">
+                        <span class="status-dot status-closed"></span>
+                        <span id="market-status-text">Chargement...</span>
+                    </span>
+                </div>
+                <h2 class="marches-title">Les marchés en un <span class="cycle-gradient-word">coup d'œil</span></h2>
+                <p class="marches-sub">Comprendre les indices dans lesquels vous investissez.</p>
+            </div>
+
+            <!-- Markets Grid -->
+            <div class="marches-edu-grid">
+
+                <!-- S&P/TSX -->
+                <div class="market-edu-card fade-in-scroll" data-symbol="TSX">
+                    <div class="mcard-top">
+                        <div class="mcard-header">
+                            <div class="mcard-flag">🇨🇦</div>
+                            <div class="mcard-title-group">
+                                <h3>S&P/TSX Composite</h3>
+                                <span class="mcard-symbol">TSX</span>
+                            </div>
+                        </div>
+                        <div class="mcard-chart-wrap">
+                            <div class="tradingview-widget-container" id="tv-tsx">
+                                <div class="tradingview-widget-container__widget"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mcard-bottom">
+                        <p class="mcard-desc">L'indice phare du marché canadien. Il regroupe environ 230 entreprises
+                            cotées à la Bourse de Toronto, représentant l'économie canadienne dans son ensemble.</p>
+                        <div class="mcard-holdings">
+                            <span class="holdings-title"><i data-lucide="building-2"
+                                    style="width:12px;height:12px;"></i> Top holdings</span>
+                            <div class="holdings-chips">
+                                <span class="holding-chip">Royal Bank 6.3%</span>
+                                <span class="holding-chip">TD Bank 5.1%</span>
+                                <span class="holding-chip">Shopify 4.8%</span>
+                                <span class="holding-chip">Enbridge 3.9%</span>
+                                <span class="holding-chip">CN Rail 3.5%</span>
+                            </div>
+                        </div>
+                        <div class="mcard-sectors">
+                            <span class="sector-chip sector-finance">Finance 33%</span>
+                            <span class="sector-chip sector-energy">Énergie 17%</span>
+                            <span class="sector-chip sector-industry">Industrie 13%</span>
+                        </div>
+                        <span class="mcard-source">Source : S&P Dow Jones Indices / TMX</span>
+                    </div>
+                </div>
+
+                <!-- S&P 500 -->
+                <div class="market-edu-card fade-in-scroll delay-1" data-symbol="SPX">
+                    <div class="mcard-top">
+                        <div class="mcard-header">
+                            <div class="mcard-flag">🇺🇸</div>
+                            <div class="mcard-title-group">
+                                <h3>S&P 500</h3>
+                                <span class="mcard-symbol">SPX</span>
+                            </div>
+                        </div>
+                        <div class="mcard-chart-wrap">
+                            <div class="tradingview-widget-container" id="tv-spx">
+                                <div class="tradingview-widget-container__widget"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mcard-bottom">
+                        <p class="mcard-desc">Le baromètre de l'économie américaine. Les 500 plus grandes entreprises
+                            cotées aux États-Unis, couvrant environ 80% de la capitalisation boursière du pays.</p>
+                        <div class="mcard-holdings">
+                            <span class="holdings-title"><i data-lucide="building-2"
+                                    style="width:12px;height:12px;"></i> Top holdings</span>
+                            <div class="holdings-chips">
+                                <span class="holding-chip">Apple 7.1%</span>
+                                <span class="holding-chip">Microsoft 6.8%</span>
+                                <span class="holding-chip">NVIDIA 6.2%</span>
+                                <span class="holding-chip">Amazon 3.8%</span>
+                                <span class="holding-chip">Meta 2.7%</span>
+                            </div>
+                        </div>
+                        <div class="mcard-sectors">
+                            <span class="sector-chip sector-tech">Tech 32%</span>
+                            <span class="sector-chip sector-finance">Finance 13%</span>
+                            <span class="sector-chip sector-health">Santé 12%</span>
+                        </div>
+                        <span class="mcard-source">Source : S&P Dow Jones Indices</span>
+                    </div>
+                </div>
+
+                <!-- NASDAQ 100 -->
+                <div class="market-edu-card fade-in-scroll delay-2" data-symbol="NDX">
+                    <div class="mcard-top">
+                        <div class="mcard-header">
+                            <div class="mcard-flag">🇺🇸</div>
+                            <div class="mcard-title-group">
+                                <h3>NASDAQ 100</h3>
+                                <span class="mcard-symbol">NDX</span>
+                            </div>
+                        </div>
+                        <div class="mcard-chart-wrap">
+                            <div class="tradingview-widget-container" id="tv-ndx">
+                                <div class="tradingview-widget-container__widget"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mcard-bottom">
+                        <p class="mcard-desc">L'indice de l'innovation. Les 100 plus grandes entreprises non financières
+                            du NASDAQ, fortement pondéré en technologie et croissance.</p>
+                        <div class="mcard-holdings">
+                            <span class="holdings-title"><i data-lucide="building-2"
+                                    style="width:12px;height:12px;"></i> Top holdings</span>
+                            <div class="holdings-chips">
+                                <span class="holding-chip">Apple 8.9%</span>
+                                <span class="holding-chip">Microsoft 8.1%</span>
+                                <span class="holding-chip">NVIDIA 7.6%</span>
+                                <span class="holding-chip">Broadcom 4.9%</span>
+                                <span class="holding-chip">Amazon 4.7%</span>
+                            </div>
+                        </div>
+                        <div class="mcard-sectors">
+                            <span class="sector-chip sector-tech">Tech 58%</span>
+                            <span class="sector-chip sector-consumer">Conso. 19%</span>
+                            <span class="sector-chip sector-health">Santé 7%</span>
+                        </div>
+                        <span class="mcard-source">Source : Nasdaq Inc.</span>
+                    </div>
+                </div>
+
+                <!-- Dow Jones -->
+                <div class="market-edu-card fade-in-scroll" data-symbol="DJI">
+                    <div class="mcard-top">
+                        <div class="mcard-header">
+                            <div class="mcard-flag">🇺🇸</div>
+                            <div class="mcard-title-group">
+                                <h3>Dow Jones</h3>
+                                <span class="mcard-symbol">DJIA</span>
+                            </div>
+                        </div>
+                        <div class="mcard-chart-wrap">
+                            <div class="tradingview-widget-container" id="tv-dji">
+                                <div class="tradingview-widget-container__widget"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mcard-bottom">
+                        <p class="mcard-desc">Le plus ancien indice boursier au monde. 30 des plus grandes entreprises
+                            américaines, pondéré par prix. Un indicateur historique des blue chips.</p>
+                        <div class="mcard-holdings">
+                            <span class="holdings-title"><i data-lucide="building-2"
+                                    style="width:12px;height:12px;"></i> Top holdings</span>
+                            <div class="holdings-chips">
+                                <span class="holding-chip">UnitedHealth 8.4%</span>
+                                <span class="holding-chip">Goldman Sachs 7.2%</span>
+                                <span class="holding-chip">Microsoft 5.8%</span>
+                                <span class="holding-chip">Home Depot 5.6%</span>
+                                <span class="holding-chip">Caterpillar 5.1%</span>
+                            </div>
+                        </div>
+                        <div class="mcard-sectors">
+                            <span class="sector-chip sector-finance">Finance 22%</span>
+                            <span class="sector-chip sector-tech">Tech 20%</span>
+                            <span class="sector-chip sector-health">Santé 17%</span>
+                        </div>
+                        <span class="mcard-source">Source : S&P Dow Jones Indices</span>
+                    </div>
+                </div>
+
+                <!-- Or (Gold) -->
+                <div class="market-edu-card fade-in-scroll delay-1" data-symbol="GOLD">
+                    <div class="mcard-top">
+                        <div class="mcard-header">
+                            <div class="mcard-flag">🥇</div>
+                            <div class="mcard-title-group">
+                                <h3>Or (Gold)</h3>
+                                <span class="mcard-symbol">XAU/USD</span>
+                            </div>
+                        </div>
+                        <div class="mcard-chart-wrap">
+                            <div class="tradingview-widget-container" id="tv-gold">
+                                <div class="tradingview-widget-container__widget"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mcard-bottom">
+                        <p class="mcard-desc">La valeur refuge par excellence. L'or est utilisé comme protection contre
+                            l'inflation et l'incertitude géopolitique. Son prix est coté en dollars US par once troy.
+                        </p>
+                        <div class="mcard-holdings">
+                            <span class="holdings-title"><i data-lucide="info" style="width:12px;height:12px;"></i> Bon
+                                à savoir</span>
+                            <div class="holdings-chips">
+                                <span class="holding-chip">1 once = 31.1g</span>
+                                <span class="holding-chip">Réserve de valeur</span>
+                                <span class="holding-chip">Anti-inflation</span>
+                                <span class="holding-chip">Non corrélé aux actions</span>
+                            </div>
+                        </div>
+                        <div class="mcard-sectors">
+                            <span class="sector-chip sector-commodity">Matière première</span>
+                            <span class="sector-chip sector-safe">Valeur refuge</span>
+                        </div>
+                        <span class="mcard-source">Source : LBMA / COMEX</span>
+                    </div>
+                </div>
+
+                <!-- Pétrole WTI -->
+                <div class="market-edu-card fade-in-scroll delay-2" data-symbol="OIL">
+                    <div class="mcard-top">
+                        <div class="mcard-header">
+                            <div class="mcard-flag">🛢️</div>
+                            <div class="mcard-title-group">
+                                <h3>Pétrole (WTI)</h3>
+                                <span class="mcard-symbol">CL/USD</span>
+                            </div>
+                        </div>
+                        <div class="mcard-chart-wrap">
+                            <div class="tradingview-widget-container" id="tv-oil">
+                                <div class="tradingview-widget-container__widget"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mcard-bottom">
+                        <p class="mcard-desc">Le West Texas Intermediate est la référence nord-américaine du pétrole
+                            brut. Particulièrement pertinent pour l'économie canadienne, 2e exportateur mondial.</p>
+                        <div class="mcard-holdings">
+                            <span class="holdings-title"><i data-lucide="info" style="width:12px;height:12px;"></i> Bon
+                                à savoir</span>
+                            <div class="holdings-chips">
+                                <span class="holding-chip">Coté en $/baril</span>
+                                <span class="holding-chip">Canada = 2e exportateur</span>
+                                <span class="holding-chip">Impact direct sur le TSX</span>
+                                <span class="holding-chip">Cyclique</span>
+                            </div>
+                        </div>
+                        <div class="mcard-sectors">
+                            <span class="sector-chip sector-commodity">Matière première</span>
+                            <span class="sector-chip sector-energy">Énergie</span>
+                        </div>
+                        <span class="mcard-source">Source : NYMEX / CME Group</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="marches-disclaimer fade-in-scroll">
+                <i data-lucide="info" style="width:14px;height:14px;"></i>
+                Les données de marché sont fournies par TradingView à titre informatif uniquement. Les rendements passés
+                ne garantissent pas les rendements futurs. Les compositions d'indices sont mises à jour périodiquement.
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Radar Strategic Section - DESIGN PREMIUM V2 -->
+    <section class="ai-radar-section-v2">
+        <!-- Animated background orbs -->
+        <div class="ai-bg-orb ai-bg-orb-1"></div>
+        <div class="ai-bg-orb ai-bg-orb-2"></div>
+        <div class="ai-bg-orb ai-bg-orb-3"></div>
+
+        <div class="container">
+            <div class="ai-radar-glass fade-in-scroll">
+                <!-- Header Premium -->
+                <div class="ai-radar-header">
+                    <div class="ai-avatar-ring">
+                        <div class="ai-avatar-pulse"></div>
+                        <i data-lucide="bot" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <div class="ai-header-text">
+                        <h2 class="ai-radar-title">Radar Stratégique I.A.</h2>
+                        <p class="ai-radar-sub">Actualités financières analysées en temps réel</p>
+                    </div>
+                    <div class="ai-header-actions">
+                        <span class="ai-live-badge">
+                            <span class="live-dot"></span>
+                            En Direct
+                        </span>
+                        <button id="refresh-ai-news" class="btn-refresh-premium" aria-label="Actualiser">
+                            <i data-lucide="refresh-cw" style="width:18px; height:18px;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtres par secteur -->
+                <div class="ai-sector-filters">
+                    <button class="sector-btn active" data-sector="all">
+                        <i data-lucide="globe-2"></i> Globale
+                    </button>
+                    <button class="sector-btn" data-sector="health">
+                        <i data-lucide="heart-pulse"></i> Santé
+                    </button>
+                    <button class="sector-btn" data-sector="tech">
+                        <i data-lucide="cpu"></i> Technologie
+                    </button>
+                    <button class="sector-btn" data-sector="crypto">
+                        <i data-lucide="bitcoin"></i> Crypto
+                    </button>
+                    <button class="sector-btn" data-sector="industrial">
+                        <i data-lucide="factory"></i> Industriel
+                    </button>
+                    <button class="sector-btn" data-sector="energy">
+                        <i data-lucide="zap"></i> Énergie
+                    </button>
+                    <button class="sector-btn" data-sector="finance">
+                        <i data-lucide="landmark"></i> Finance
+                    </button>
+                    <button class="sector-btn" data-sector="defensive">
+                        <i data-lucide="shield"></i> Défensif
+                    </button>
+                </div>
+
+                <!-- Liste des nouvelles -->
+                <div id="news-container" class="news-container-v2">
+                    <div class="news-loading">
+                        <div class="loading-pulse">
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring"></div>
+                            <i data-lucide="bot" style="width:28px; height:28px; color: #0077b6;"></i>
+                        </div>
+                        <p>Analyse des marchés en cours...</p>
+                        <div class="loading-bar">
+                            <div class="loading-bar-inner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="ai-radar-footer">
+                    <div class="ai-sources-hint">
+                        <i data-lucide="database" style="width:13px; height:13px;"></i>
+                        Sources : Bloomberg, CNBC, La Presse, Les Affaires, et plus
+                    </div>
+                    <div class="ai-update-time">
+                        <i data-lucide="clock" style="width:13px; height:13px;"></i>
+                        <span id="last-update-time">Dernière mise à jour : Il y a quelques instants</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nos Conseils Placements Section -->
+    <section id="conseils" class="section-padding gradient-section gradient-cyan-to-light">
+        <div class="container">
+            <div class="section-header text-center fade-in-scroll">
+                <span class="section-tag"><i data-lucide="book-open"></i> Ressources & Savoir</span>
+                <h2>Nos <span class="text-gradient">Conseils</span></h2>
+                <p class="mission-subtitle">Des articles pour vous guider dans vos décisions financières.</p>
+                <a href="#" class="voir-tous">Voir tous les articles <i data-lucide="arrow-up-right"></i></a>
+            </div>
+
+            <div class="conseils-grid">
+                <!-- Card 1 -->
+                <article class="conseil-card fade-in-scroll">
+                    <div class="conseil-image">
+                        <img src="https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=600&q=80"
+                            alt="Stratégies de placement">
+                        <span class="conseil-tag">Stratégie</span>
+                    </div>
+                    <div class="conseil-content">
+                        <div class="conseil-meta">
+                            <span><i data-lucide="clock"></i> 5 min de lecture</span>
+                        </div>
+                        <h3>5 stratégies de placement pour optimiser votre portefeuille</h3>
+                        <p class="conseil-excerpt">Découvrez les approches éprouvées pour maximiser vos rendements tout
+                            en gérant le risque efficacement.</p>
+                        <a href="#" class="conseil-btn">Lire la suite <i data-lucide="arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <!-- Card 2 -->
+                <article class="conseil-card fade-in-scroll delay-1">
+                    <div class="conseil-image">
+                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80"
+                            alt="Diversification">
+                        <span class="conseil-tag">Investissement</span>
+                    </div>
+                    <div class="conseil-content">
+                        <div class="conseil-meta">
+                            <span><i data-lucide="clock"></i> 4 min de lecture</span>
+                        </div>
+                        <h3>L'importance de la diversification dans vos investissements</h3>
+                        <p class="conseil-excerpt">Pourquoi ne jamais mettre tous ses œufs dans le même panier reste la
+                            règle d'or de l'investisseur avisé.</p>
+                        <a href="#" class="conseil-btn">Lire la suite <i data-lucide="arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <!-- Card 3 -->
+                <article class="conseil-card fade-in-scroll delay-2">
+                    <div class="conseil-image">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80"
+                            alt="Planification retraite">
+                        <span class="conseil-tag">Retraite</span>
+                    </div>
+                    <div class="conseil-content">
+                        <div class="conseil-meta">
+                            <span><i data-lucide="clock"></i> 6 min de lecture</span>
+                        </div>
+                        <h3>Planifier sa retraite : par où commencer?</h3>
+                        <p class="conseil-excerpt">Les étapes essentielles pour bâtir un plan de retraite solide, peu
+                            importe votre âge actuel.</p>
+                        <a href="#" class="conseil-btn">Lire la suite <i data-lucide="arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Vapor Fog Divider -->
+    <div class="chameleon-divider" onclick="document.getElementById('equipe').scrollIntoView({behavior: 'smooth'})">
+        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="vapor-gradient-4" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#b8d4e8">
+                        <animate attributeName="stop-color" values="#b8d4e8;#0077b6;#5fa8d3;#b8d4e8" dur="22s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="50%" style="stop-color:#0077b6">
+                        <animate attributeName="stop-color" values="#0077b6;#5fa8d3;#b8d4e8;#0077b6" dur="22s"
+                            repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="100%" style="stop-color:#5fa8d3">
+                        <animate attributeName="stop-color" values="#5fa8d3;#b8d4e8;#0077b6;#5fa8d3" dur="22s"
+                            repeatCount="indefinite" />
+                    </stop>
+                </linearGradient>
+            </defs>
+            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-4)"
+                fill="none" stroke-width="8" />
+            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-4)"
+                fill="none" stroke-width="6" />
+            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-4)"
+                fill="none" stroke-width="4" />
+        </svg>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <!-- Left side particles -->
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <div class="particle-left"></div>
+            <!-- Right side particles -->
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+            <div class="particle-right"></div>
+        </div>
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Team Section (Carousel Layout) -->
+    <section id="equipe" class="section-padding gradient-section gradient-light-to-white team-carousel-section">
+        <div class="container team-layout">
+            <!-- Left Sidebar -->
+            <div class="team-sidebar fade-in-scroll">
+                <h2>Rencontrer votre équipe <br><span class="text-gradient">d'experts dédiés</span></h2>
+                <p class="team-intro">Notre équipe de conseillers certifiés et d'experts vous accompagne avec passion et
+                    rigueur dans chaque étape de votre vie financière.</p>
+
+                <ul class="team-features">
+                    <li>
+                        <i data-lucide="check-circle-2"></i>
+                        <div>
+                            <strong>Experts Certifiés</strong>
+                            <p>Des professionnels reconnus dans leur domaine.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i data-lucide="check-circle-2"></i>
+                        <div>
+                            <strong>Approche Humaine</strong>
+                            <p>Des solutions basées sur vos besoins réels.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i data-lucide="check-circle-2"></i>
+                        <div>
+                            <strong>Disponibilité</strong>
+                            <p>Un accompagnement personnalisé à chaque étape.</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="team-nav-controls">
+                    <button id="team-prev" class="nav-btn" aria-label="Précédent"><i
+                            data-lucide="chevron-left"></i></button>
+                    <button id="team-next" class="nav-btn" aria-label="Suivant"><i
+                            data-lucide="chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Right Carousel -->
+            <div class="team-carousel-wrapper fade-in-scroll delay-1">
+                <div class="team-track" id="team-track">
+                    <!-- Member 1 -->
+                    <div class="team-card-slide">
+                        <div class="team-photo-box placeholder-empty">
+                            <!-- Empty Space -->
+                        </div>
+                        <div class="team-info-box">
+                            <h4>Martin Brassard</h4>
+                            <span class="role">Gestionnaire de Portefeuille Adjoint</span>
+                            <div class="info-divider"></div>
+                            <p class="card-bio">Expert en optimisation de portefeuille technique. Gestion rigoureuse
+                                pour votre rendement.</p>
+                            <a href="#" class="btn-small-team">En savoir plus <i data-lucide="arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Member 2 -->
+                    <div class="team-card-slide">
+                        <div class="team-photo-box placeholder-empty">
+                            <!-- Empty Space -->
+                        </div>
+                        <div class="team-info-box">
+                            <h4>Philippe Gobeil</h4>
+                            <span class="role">Conseiller Gestion de Patrimoine</span>
+                            <div class="info-divider"></div>
+                            <p class="card-bio">Spécialiste en planification successorale et fiscale pour les familles
+                                fortunées.</p>
+                            <a href="#" class="btn-small-team">En savoir plus <i data-lucide="arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Member 3 -->
+                    <div class="team-card-slide">
+                        <div class="team-photo-box placeholder-empty">
+                            <!-- Empty Space -->
+                        </div>
+                        <div class="team-info-box">
+                            <h4>Serge Parent</h4>
+                            <span class="role">Conseiller en Placement</span>
+                            <div class="info-divider"></div>
+                            <p class="card-bio">25 ans d'expérience et une perspective unique sur les cycles
+                                économiques.</p>
+                            <a href="#" class="btn-small-team">En savoir plus <i data-lucide="arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Member 4 -->
+                    <div class="team-card-slide">
+                        <div class="team-photo-box placeholder-empty">
+                            <!-- Empty Space -->
+                        </div>
+                        <div class="team-info-box">
+                            <h4>Daniel Robitaille</h4>
+                            <span class="role">Conseiller en Placement</span>
+                            <div class="info-divider"></div>
+                            <p class="card-bio">Une approche centrée sur l'écoute et la compréhension profonde de vos
+                                objectifs.</p>
+                            <a href="#" class="btn-small-team">En savoir plus <i data-lucide="arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Member 5 -->
+                    <div class="team-card-slide">
+                        <div class="team-photo-box placeholder-empty">
+                            <!-- Empty Space -->
+                        </div>
+                        <div class="team-info-box">
+                            <h4>Nicolas Perron</h4>
+                            <span class="role">Adjoint Administratif</span>
+                            <div class="info-divider"></div>
+                            <p class="card-bio">Le pilier de notre service client. Rapidité, efficacité et sourire.</p>
+                            <a href="#" class="btn-small-team">En savoir plus <i data-lucide="arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section-padding bg-white">
+        <div class="container">
+            <div class="section-header text-center fade-in-scroll">
+                <h2>Questions <span class="text-gradient">Fréquentes</span></h2>
+            </div>
+
+            <div class="faq-container fade-in-scroll">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Quelle est votre approche de gestion?</h3>
+                        <i data-lucide="plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Nous privilégions une approche active et diversifiée, alignée sur vos objectifs personnels et
+                            ajustée tactiquement selon les cycles économiques.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Acceptez-vous de nouveaux clients?</h3>
+                        <i data-lucide="plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Oui, nous acceptons de nouveaux clients qui recherchent une relation de confiance à long
+                            terme. Contactez-nous pour une première consultation exploratoire.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Comment sont calculés vos frais?</h3>
+                        <i data-lucide="plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Nos honoraires sont basés sur un pourcentage transparent des actifs sous gestion, ce qui
+                            garantit que nos intérêts sont parfaitement alignés avec la croissance de votre patrimoine.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" aria-label="Retour en haut">
+        <i data-lucide="arrow-up"></i>
+    </button>
+
+    <!-- ============================================
+     COMPOSANTE 3 : SECTION FORMULAIRE DE CONTACT
+     ============================================ -->
+    <section id="contact-form-section" class="section-padding contact-form-section">
+        <div class="container">
+            <div class="contact-layout fade-in-scroll">
+
+                <!-- LEFT: Info -->
+                <div class="contact-info-col">
+                    <span class="section-badge"><i data-lucide="send"></i> Contact</span>
+                    <h2>Parlons de <span class="text-gradient">votre avenir</span></h2>
+                    <p class="contact-intro">Laissez-nous vos coordonnées et un membre de notre équipe vous contactera
+                        dans les plus brefs délais pour une consultation gratuite.</p>
+
+                    <div class="contact-details">
+                        <a href="tel:4185772087" class="contact-detail-item">
+                            <div class="detail-icon"><i data-lucide="phone" style="width:18px;height:18px;"></i></div>
+                            <div>
+                                <strong>Téléphone</strong>
+                                <span>418-577-2087</span>
+                            </div>
+                        </a>
+                        <a href="mailto:nicolas.perron@iagestionprivee.ca" class="contact-detail-item">
+                            <div class="detail-icon"><i data-lucide="mail" style="width:18px;height:18px;"></i></div>
+                            <div>
+                                <strong>Courriel</strong>
+                                <span>nicolas.perron@iagestionprivee.ca</span>
+                            </div>
+                        </a>
+                        <div class="contact-detail-item">
+                            <div class="detail-icon"><i data-lucide="map-pin" style="width:18px;height:18px;"></i></div>
+                            <div>
+                                <strong>Bureau</strong>
+                                <span>Québec, QC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-trust">
+                        <div class="trust-badge-item"><i data-lucide="shield-check" style="width:16px;height:16px;"></i>
+                            25+ ans d'expérience</div>
+                        <div class="trust-badge-item"><i data-lucide="users" style="width:16px;height:16px;"></i> 500+
+                            familles accompagnées</div>
+                        <div class="trust-badge-item"><i data-lucide="award" style="width:16px;height:16px;"></i> 100%
+                            indépendant</div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Form -->
+                <div class="contact-form-col">
+                    <form class="contact-form-glass" id="contact-form"
+                        action="https://formsubmit.co/nicolas.perron@iagestionprivee.ca" method="POST">
+                        <!-- FormSubmit config -->
+                        <input type="hidden" name="_subject" value="Nouveau contact - Groupe Financier Ste-Foy">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_next" value="">
+                        <input type="text" name="_honey" style="display:none">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-prenom">Prénom</label>
+                                <input type="text" id="contact-prenom" name="prenom" placeholder="Votre prénom"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-nom">Nom</label>
+                                <input type="text" id="contact-nom" name="nom" placeholder="Votre nom" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-email">Courriel</label>
+                            <input type="email" id="contact-email" name="email" placeholder="votre@courriel.com"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-tel">Téléphone</label>
+                            <input type="tel" id="contact-tel" name="telephone" placeholder="(418) 000-0000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-sujet">Sujet</label>
+                            <select id="contact-sujet" name="sujet">
+                                <option value="consultation">Consultation gratuite</option>
+                                <option value="portefeuille">Gestion de portefeuille</option>
+                                <option value="retraite">Planification de retraite</option>
+                                <option value="fiscal">Stratégie fiscale</option>
+                                <option value="succession">Planification successorale</option>
+                                <option value="autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-message">Message <span class="optional">(optionnel)</span></label>
+                            <textarea id="contact-message" name="message"
+                                placeholder="Décrivez brièvement votre situation ou vos questions..."
+                                rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="form-submit-btn" id="form-submit-btn">
+                            <i data-lucide="send" style="width:18px;height:18px;"></i>
+                            Envoyer ma demande
+                        </button>
+
+                        <p class="form-disclaimer"><i data-lucide="lock" style="width:12px;height:12px;"></i> Vos
+                            informations restent strictement confidentielles.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <img src="./assets/logo.png" alt="Logo Footer" style="height: 50px; margin-bottom: 20px;">
+                <p>Votre partenaire fiduciaire à Québec.</p>
+            </div>
+            <div class="footer-links">
+                <h5>Liens Rapides</h5>
+                <a href="#mission">Mission</a>
+                <a href="#services">Services</a>
+                <a href="#equipe">Équipe</a>
+            </div>
+            <div class="footer-contact">
+                <h5>Nous Contacter</h5>
+                <p><i data-lucide="map-pin"></i> Québec, QC</p>
+                <p><i data-lucide="phone"></i> 418-577-2087</p>
+                <p><i data-lucide="mail"></i> nicolas.perron@iagestionprivee.ca</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Groupe Financier Ste-Foy. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <!-- Chart.js for Custom Live Markets -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/compas.js"></script>
+    <script src="./js/cycle-v4.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // === MOBILE MENU TOGGLE ===
+        (function () {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const menuClose = document.querySelector('.menu-close');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const menuLinks = document.querySelectorAll('.mobile-menu a');
+
+            if (menuToggle && mobileMenu) {
+                menuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            if (menuClose && mobileMenu) {
+                menuClose.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            menuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (mobileMenu) {
+                        mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+        })();
+
+        // === NAVBAR SCROLL EFFECT ===
+        (function () {
+            const nav = document.getElementById('main-nav');
+            if (!nav) return;
+            window.addEventListener('scroll', () => {
+                nav.classList.toggle('scrolled', window.scrollY > 50);
+            }, { passive: true });
+        })();
+
+        // === VIDEO BACKGROUND CAROUSEL (12s) ===
+        (function () {
+            const videos = document.querySelectorAll('.hero-vid');
+            if (videos.length < 2) return;
+
+            let current = 0;
+
+            setInterval(() => {
+                videos[current].classList.remove('active');
+                current = (current + 1) % videos.length;
+                videos[current].classList.add('active');
+            }, 12000);
+        })();
+
+        // === FLOATING PARTICLES ===
+        (function () {
+            const container = document.getElementById('hero-particles');
+            if (!container) return;
+
+            for (let i = 0; i < 25; i++) {
+                const p = document.createElement('div');
+                p.className = 'hero-particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = (30 + Math.random() * 70) + '%';
+                p.style.width = p.style.height = (3 + Math.random() * 5) + 'px';
+                p.style.setProperty('--duration', (5 + Math.random() * 10) + 's');
+                p.style.setProperty('--delay', (Math.random() * 8) + 's');
+                container.appendChild(p);
+            }
+        })();
+    </script>
+    <script src="./js/conversion.js"></script>
+    <script src="./js/marches-v2.js"></script>
+    <!-- ============================================
+     COMPOSANTE 1 : BOUTON FLOTTANT PERMANENT
+     ============================================ -->
+    <div class="floating-cta" id="floating-cta">
+        <button class="floating-cta-btn" id="floating-cta-btn" aria-label="Nous contacter">
+            <i data-lucide="message-circle"></i>
+            <span class="floating-cta-label">Consultation gratuite</span>
+        </button>
+
+        <!-- Expandable Mini Panel -->
+        <div class="floating-cta-panel" id="floating-cta-panel">
+            <div class="floating-panel-header">
+                <span>Comment pouvons-nous vous aider?</span>
+                <button class="floating-panel-close" id="floating-panel-close"><i data-lucide="x"
+                        style="width:16px;height:16px;"></i></button>
+            </div>
+            <a href="tel:4185772087" class="floating-panel-option">
+                <div class="panel-option-icon phone-icon"><i data-lucide="phone" style="width:18px;height:18px;"></i>
+                </div>
+                <div>
+                    <strong>Appeler maintenant</strong>
+                    <span>418-577-2087</span>
+                </div>
+            </a>
+            <a href="#contact-form-section" class="floating-panel-option" id="floating-form-link">
+                <div class="panel-option-icon form-icon"><i data-lucide="calendar" style="width:18px;height:18px;"></i>
+                </div>
+                <div>
+                    <strong>Prendre rendez-vous</strong>
+                    <span>On vous rappelle rapidement</span>
+                </div>
+            </a>
+            <a href="mailto:nicolas.perron@iagestionprivee.ca" class="floating-panel-option">
+                <div class="panel-option-icon mail-icon"><i data-lucide="mail" style="width:18px;height:18px;"></i>
+                </div>
+                <div>
+                    <strong>Écrire un courriel</strong>
+                    <span>nicolas.perron@iagestionprivee.ca</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</body>
