@@ -23,6 +23,1632 @@
     <link rel="stylesheet" href="./css/compas.css">
     <link rel="stylesheet" href="./css/marches-v2.css">
     <link rel="stylesheet" href="./css/conversion.css">
+    <style>
+        :root {
+            --dark: #03045e;
+            --mid: #0077b6;
+            --cyan: #00b4d8;
+            --light: #f3f6fa;
+            --white: #fff;
+            --text: #1a2a3a;
+            --muted: #586e82
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--text);
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--dark)
+        }
+
+        ::selection {
+            background: var(--cyan);
+            color: #fff
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, var(--dark), var(--cyan), #5fcde4, var(--cyan), var(--dark));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shim 5s ease infinite
+        }
+
+        @keyframes shim {
+            0% {
+                background-position: 100%
+            }
+
+            50% {
+                background-position: 0%
+            }
+
+            100% {
+                background-position: 100%
+            }
+        }
+
+        .mission {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(170deg, var(--white) 0%, var(--light) 20%, #daeef8 50%, var(--light) 80%, var(--white) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 40px
+        }
+
+        .m-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden
+        }
+
+        .m-bg .bl {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: blb 16s ease-in-out infinite alternate
+        }
+
+        .m-bg .bl.b1 {
+            width: 450px;
+            height: 450px;
+            background: rgba(0, 180, 216, 0.06);
+            top: -20%;
+            right: -12%
+        }
+
+        .m-bg .bl.b2 {
+            width: 350px;
+            height: 350px;
+            background: rgba(0, 119, 182, 0.04);
+            bottom: -12%;
+            left: -8%;
+            animation-delay: -6s
+        }
+
+        @keyframes blb {
+            0% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            100% {
+                transform: translate(50px, -30px) scale(1.2)
+            }
+        }
+
+        .m-grid {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(0, 180, 216, 0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 180, 216, 0.018) 1px, transparent 1px);
+            background-size: 70px 70px
+        }
+
+        .m-badge-top {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-bottom: 20px
+        }
+
+        .m-badge-top .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .65rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            padding: 8px 20px;
+            border: 1px solid rgba(0, 180, 216, .2);
+            border-radius: 100px;
+            background: rgba(0, 180, 216, .05);
+            backdrop-filter: blur(6px)
+        }
+
+        .m-wrap {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            max-width: 1260px;
+            width: 100%
+        }
+
+        .m-txt {
+            flex: 0 1 440px;
+            min-width: 340px
+        }
+
+        .badge svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .bigN {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: .85;
+            background: linear-gradient(180deg, rgba(0, 180, 216, .14), rgba(0, 180, 216, .02));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+            transition: all .5s cubic-bezier(.22, 1, .36, 1);
+            user-select: none
+        }
+
+        .m-txt h2 {
+            font-size: clamp(1.3rem, 2.8vw, 2rem);
+            line-height: 1.08;
+            margin-bottom: 10px;
+            font-weight: 800;
+            transition: all .4s
+        }
+
+        .m-txt h2 .em {
+            color: var(--cyan);
+            font-style: normal
+        }
+
+        .m-txt .desc {
+            font-size: .85rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            transition: all .4s ease .05s
+        }
+
+        .mnav {
+            display: flex;
+            gap: 7px;
+            align-items: center
+        }
+
+        .mdot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 180, 216, .12);
+            background: rgba(255, 255, 255, .8);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .45s cubic-bezier(.34, 1.56, .64, 1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+            position: relative
+        }
+
+        .mdot svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--muted);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all .3s
+        }
+
+        .mdot:hover {
+            transform: scale(1.12);
+            border-color: rgba(0, 180, 216, .35);
+            box-shadow: 0 6px 24px rgba(0, 180, 216, .12)
+        }
+
+        .mdot.on {
+            border-color: var(--cyan);
+            background: linear-gradient(135deg, var(--cyan), var(--mid));
+            transform: scale(1.18);
+            box-shadow: 0 8px 32px rgba(0, 180, 216, .35), 0 0 20px rgba(0, 180, 216, .15)
+        }
+
+        .mdot.on svg {
+            stroke: #fff
+        }
+
+        .mdot.on::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 180, 216, .3);
+            animation: dp 2s ease-out infinite
+        }
+
+        @keyframes dp {
+            0% {
+                transform: scale(1);
+                opacity: .8
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0
+            }
+        }
+
+        .dsep {
+            width: 12px;
+            height: 2px;
+            background: rgba(0, 180, 216, .1);
+            border-radius: 2px
+        }
+
+        .prism-stage {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 900px;
+            min-height: 380px;
+            position: relative
+        }
+
+        .p-aura {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 180, 216, .1) 0%, rgba(0, 180, 216, .02) 45%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: aura 4s ease-in-out infinite;
+            pointer-events: none
+        }
+
+        @keyframes aura {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: .5
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+                opacity: 1
+            }
+        }
+
+        .p-shadow {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 30px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(3, 4, 94, .09) 0%, transparent 70%);
+            animation: psh 6s ease-in-out infinite;
+            pointer-events: none
+        }
+
+        @keyframes psh {
+
+            0%,
+            100% {
+                transform: translateX(-50%) scaleX(1) scaleY(1);
+                opacity: .7
+            }
+
+            50% {
+                transform: translateX(-50%) scaleX(.75) scaleY(.5);
+                opacity: .3
+            }
+        }
+
+        .p-float {
+            transform-style: preserve-3d;
+            animation: pfl 8s ease-in-out infinite
+        }
+
+        @keyframes pfl {
+            0% {
+                transform: translateY(0) rotateX(-1deg) rotateZ(.3deg)
+            }
+
+            50% {
+                transform: translateY(-6px) rotateX(1deg) rotateZ(-.3deg)
+            }
+
+            100% {
+                transform: translateY(0) rotateX(-1deg) rotateZ(.3deg)
+            }
+        }
+
+        .prism {
+            width: 200px;
+            height: 280px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.1s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .pf {
+            position: absolute;
+            width: 200px;
+            height: 280px;
+            backface-visibility: hidden;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px 16px;
+            background: linear-gradient(160deg, rgba(255, 255, 255, .88), rgba(240, 248, 255, .7));
+            backdrop-filter: blur(8px);
+            border: none;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, .07);
+            overflow: hidden
+        }
+
+        .pf-border {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden
+        }
+
+        .pf-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1.5px solid rgba(0, 180, 216, .12);
+            pointer-events: none
+        }
+
+        .pf-tl {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25px;
+            height: 25px;
+            pointer-events: none;
+            z-index: 3;
+            border-top: 2px solid var(--cyan);
+            border-left: 2px solid var(--cyan);
+            opacity: .5;
+            animation: cp 3s ease-in-out infinite
+        }
+
+        .pf-br {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 25px;
+            height: 25px;
+            pointer-events: none;
+            z-index: 3;
+            border-bottom: 2px solid var(--cyan);
+            border-right: 2px solid var(--cyan);
+            opacity: .5;
+            animation: cp 3s ease-in-out infinite 1.5s
+        }
+
+        @keyframes cp {
+
+            0%,
+            100% {
+                opacity: .3
+            }
+
+            50% {
+                opacity: .8
+            }
+        }
+
+        .pf::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0, 180, 216, .25), rgba(0, 180, 216, .08), rgba(0, 180, 216, .25));
+            pointer-events: none;
+            z-index: 3;
+            box-shadow: 0 0 8px rgba(0, 180, 216, .15)
+        }
+
+        .pf::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, .03), rgba(0, 0, 0, .08), rgba(0, 0, 0, .03));
+            pointer-events: none;
+            z-index: 3
+        }
+
+        .pf:nth-child(1) {
+            transform: rotateY(0deg) translateZ(138px)
+        }
+
+        .pf:nth-child(2) {
+            transform: rotateY(72deg) translateZ(138px)
+        }
+
+        .pf:nth-child(3) {
+            transform: rotateY(144deg) translateZ(138px)
+        }
+
+        .pf:nth-child(4) {
+            transform: rotateY(216deg) translateZ(138px)
+        }
+
+        .pf:nth-child(5) {
+            transform: rotateY(288deg) translateZ(138px)
+        }
+
+        .pf:nth-child(1) .pf-tint {
+            background: linear-gradient(160deg, rgba(0, 180, 216, .08), transparent 50%)
+        }
+
+        .pf:nth-child(2) .pf-tint {
+            background: linear-gradient(160deg, rgba(0, 119, 182, .08), transparent 50%)
+        }
+
+        .pf:nth-child(3) .pf-tint {
+            background: linear-gradient(160deg, rgba(3, 4, 94, .06), transparent 50%)
+        }
+
+        .pf:nth-child(4) .pf-tint {
+            background: linear-gradient(160deg, rgba(0, 200, 150, .06), transparent 50%)
+        }
+
+        .pf:nth-child(5) .pf-tint {
+            background: linear-gradient(160deg, rgba(144, 224, 239, .08), transparent 50%)
+        }
+
+        .pf-tint {
+            position: absolute;
+            inset: 0;
+            pointer-events: none
+        }
+
+        .pf-n {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            position: absolute;
+            top: 0;
+            right: 12px;
+            line-height: 1;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(0, 180, 216, .07), rgba(0, 180, 216, .02));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .pf-ic {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, .7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, .05), 0 0 0 1px rgba(0, 180, 216, .08);
+            position: relative;
+            z-index: 4
+        }
+
+        .pf-ic svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--mid);
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .pf h3 {
+            font-size: .9rem;
+            margin-bottom: 10px;
+            line-height: 1.25;
+            position: relative;
+            z-index: 4;
+            color: var(--dark);
+            display: inline-block
+        }
+
+        .pf h3::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), #5fcde4, var(--cyan));
+            background-size: 200% 100%;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .4s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .pf h3:hover::after {
+            transform: scaleX(1);
+            animation: hlS 2s ease infinite
+        }
+
+        @keyframes hlS {
+            0% {
+                background-position: 0%
+            }
+
+            50% {
+                background-position: 100%
+            }
+
+            100% {
+                background-position: 0%
+            }
+        }
+
+        .pf p {
+            font-size: .72rem;
+            color: var(--muted);
+            line-height: 1.7;
+            position: relative;
+            z-index: 4
+        }
+
+        .pf p .glow {
+            font-size: inherit;
+            font-weight: 700
+        }
+
+        .glow {
+            display: inline;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--dark), var(--cyan), #5fcde4, var(--cyan), var(--dark));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shim 5s ease infinite
+        }
+
+        .pf-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
+            padding: 4px 12px;
+            border-radius: 0;
+            background: linear-gradient(90deg, rgba(0, 180, 216, .08), rgba(0, 180, 216, .04));
+            border-left: 2px solid var(--cyan);
+            font-family: 'Montserrat', sans-serif;
+            font-size: .58rem;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 4;
+            box-shadow: 0 0 12px rgba(0, 180, 216, .08)
+        }
+
+        .pf-tag svg {
+            width: 10px;
+            height: 10px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .cham {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            overflow: hidden;
+            z-index: 50;
+            margin: -20px 0;
+            pointer-events: auto;
+            cursor: pointer
+        }
+
+        .cham svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            filter: blur(2px);
+            transition: filter .5s ease
+        }
+
+        .cham:hover svg {
+            filter: blur(1px)
+        }
+
+        .cham:hover .cw {
+            stroke-width: 14 !important;
+            opacity: 1 !important;
+            filter: blur(2px) !important
+        }
+
+        .cw {
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke-width .4s ease, opacity .4s ease, filter .4s ease
+        }
+
+        .cw1 {
+            animation: vf1 12s ease-in-out infinite;
+            filter: blur(3px);
+            opacity: .85
+        }
+
+        .cw2 {
+            animation: vf2 15s ease-in-out infinite;
+            filter: blur(4px);
+            opacity: .7
+        }
+
+        .cw3 {
+            animation: vf3 18s ease-in-out infinite;
+            filter: blur(5px);
+            opacity: .55
+        }
+
+        @keyframes vf1 {
+
+            0%,
+            100% {
+                d: path("M0,70 Q300,40 600,70 T1200,70");
+                transform: translateY(0)
+            }
+
+            50% {
+                d: path("M0,70 Q300,100 600,70 T1200,70");
+                transform: translateY(-8px)
+            }
+        }
+
+        @keyframes vf2 {
+
+            0%,
+            100% {
+                d: path("M0,80 Q400,110 800,80 T1200,80");
+                transform: translateY(0) translateX(0)
+            }
+
+            33% {
+                d: path("M0,80 Q400,50 800,80 T1200,80");
+                transform: translateY(8px) translateX(15px)
+            }
+
+            66% {
+                d: path("M0,80 Q400,95 800,80 T1200,80");
+                transform: translateY(-5px) translateX(-8px)
+            }
+        }
+
+        @keyframes vf3 {
+
+            0%,
+            100% {
+                d: path("M0,60 Q350,30 700,60 T1200,60");
+                transform: translateY(0)
+            }
+
+            50% {
+                d: path("M0,60 Q350,90 700,60 T1200,60");
+                transform: translateY(10px)
+            }
+        }
+
+        .cham::before,
+        .cham::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(184, 212, 232, .1) 20%, rgba(135, 206, 235, .15) 50%, rgba(184, 212, 232, .1) 80%, rgba(255, 255, 255, 0) 100%);
+            filter: blur(20px);
+            animation: fogD 25s ease-in-out infinite, fogP 6s ease-in-out infinite;
+            transition: opacity .4s ease, filter .4s ease
+        }
+
+        .cham::before {
+            top: 0;
+            animation-delay: -5s
+        }
+
+        .cham::after {
+            bottom: 0;
+            animation-delay: -10s;
+            opacity: .6
+        }
+
+        .cham:hover::before,
+        .cham:hover::after {
+            opacity: 1;
+            filter: blur(15px);
+            animation: fogD 15s ease-in-out infinite, fogPI 2s ease-in-out infinite
+        }
+
+        @keyframes fogD {
+
+            0%,
+            100% {
+                transform: translateX(-5%) scaleX(1.1)
+            }
+
+            50% {
+                transform: translateX(5%) scaleX(1)
+            }
+        }
+
+        @keyframes fogP {
+
+            0%,
+            100% {
+                opacity: .5
+            }
+
+            50% {
+                opacity: .8
+            }
+        }
+
+        @keyframes fogPI {
+
+            0%,
+            100% {
+                opacity: .8
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        .cham .pts {
+            position: absolute;
+            inset: 0;
+            overflow: visible;
+            pointer-events: none
+        }
+
+        .cham .pt {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(0, 180, 216, .7), transparent);
+            border-radius: 50%;
+            animation: fPt 10s ease-in-out infinite
+        }
+
+        .cham .pt:nth-child(1) {
+            left: 20%;
+            animation-delay: 0s
+        }
+
+        .cham .pt:nth-child(2) {
+            left: 35%;
+            animation-delay: -2s
+        }
+
+        .cham .pt:nth-child(3) {
+            left: 50%;
+            animation-delay: -4s
+        }
+
+        .cham .pt:nth-child(4) {
+            left: 65%;
+            animation-delay: -1s
+        }
+
+        .cham .pt:nth-child(5) {
+            left: 80%;
+            animation-delay: -3s
+        }
+
+        .cham .pt:nth-child(6) {
+            left: 90%;
+            animation-delay: -5s
+        }
+
+        .cham .ptl {
+            position: absolute;
+            left: 2%;
+            width: 5px;
+            height: 5px;
+            background: radial-gradient(circle, rgba(173, 216, 230, .6), transparent);
+            border-radius: 50%;
+            animation: fSPt 12s ease-in-out infinite
+        }
+
+        .cham .ptl:nth-child(7) {
+            top: 20%;
+            animation-delay: 0s
+        }
+
+        .cham .ptl:nth-child(8) {
+            top: 50%;
+            animation-delay: -3s;
+            left: 4%
+        }
+
+        .cham .ptl:nth-child(9) {
+            top: 80%;
+            animation-delay: -6s;
+            left: 1%
+        }
+
+        .cham .ptr {
+            position: absolute;
+            right: 2%;
+            width: 5px;
+            height: 5px;
+            background: radial-gradient(circle, rgba(173, 216, 230, .6), transparent);
+            border-radius: 50%;
+            animation: fSPt 12s ease-in-out infinite reverse
+        }
+
+        .cham .ptr:nth-child(10) {
+            top: 30%;
+            animation-delay: -2s
+        }
+
+        .cham .ptr:nth-child(11) {
+            top: 60%;
+            animation-delay: -5s;
+            right: 5%
+        }
+
+        .cham .ptr:nth-child(12) {
+            top: 90%;
+            animation-delay: -8s;
+            right: 3%
+        }
+
+        @keyframes fPt {
+
+            0%,
+            100% {
+                transform: translateY(60px) scale(0);
+                opacity: 0
+            }
+
+            15% {
+                opacity: .7;
+                transform: translateY(50px) scale(1)
+            }
+
+            50% {
+                transform: translateY(25px) scale(1.1);
+                opacity: .5
+            }
+
+            85% {
+                opacity: .7;
+                transform: translateY(5px) scale(1)
+            }
+
+            100% {
+                transform: translateY(-10px) scale(0);
+                opacity: 0
+            }
+        }
+
+        @keyframes fSPt {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0) scale(.5);
+                opacity: .3
+            }
+
+            25% {
+                transform: translateY(-20px) translateX(10px) scale(1);
+                opacity: .6
+            }
+
+            50% {
+                transform: translateY(-40px) translateX(-5px) scale(.8);
+                opacity: .5
+            }
+
+            75% {
+                transform: translateY(-60px) translateX(15px) scale(1.1);
+                opacity: .7
+            }
+
+            100% {
+                transform: translateY(-80px) translateX(0) scale(.5);
+                opacity: .3
+            }
+        }
+
+        .services {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(175deg, #f8fbff 0%, #eef4fa 40%, #e4eef7 70%, #f0f5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 24px 28px
+        }
+
+        .sv-orbs {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden
+        }
+
+        .sv-orb {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 180, 216, .06)
+        }
+
+        .sv-orb.o1 {
+            width: 600px;
+            height: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: orbRot 60s linear infinite
+        }
+
+        .sv-orb.o2 {
+            width: 420px;
+            height: 420px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-style: dashed;
+            border-color: rgba(0, 119, 182, .04);
+            animation: orbRot 45s linear infinite reverse
+        }
+
+        .sv-orb.o3 {
+            width: 240px;
+            height: 240px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-color: rgba(0, 180, 216, .08);
+            animation: orbRot 30s linear infinite
+        }
+
+        @keyframes orbRot {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg)
+            }
+        }
+
+        .sv-orb-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--mid));
+            box-shadow: 0 0 10px rgba(0, 180, 216, .3)
+        }
+
+        .o1 .sv-orb-dot {
+            top: -4px;
+            left: 50%
+        }
+
+        .o2 .sv-orb-dot {
+            bottom: -4px;
+            left: 50%
+        }
+
+        .o3 .sv-orb-dot {
+            top: 50%;
+            right: -4px
+        }
+
+        .sv-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none
+        }
+
+        .sv-blob.b1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 180, 216, .04);
+            top: 10%;
+            right: 5%;
+            animation: blobF 18s ease-in-out infinite
+        }
+
+        .sv-blob.b2 {
+            width: 350px;
+            height: 350px;
+            background: rgba(0, 119, 182, .03);
+            bottom: 10%;
+            left: 8%;
+            animation: blobF 22s ease-in-out infinite -8s
+        }
+
+        @keyframes blobF {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            50% {
+                transform: translate(25px, -20px) scale(1.12)
+            }
+        }
+
+        .sv-wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 1080px;
+            width: 100%;
+            margin: 0 auto
+        }
+
+        .sv-hd {
+            text-align: center;
+            margin-bottom: 14px
+        }
+
+        .sv-hd .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .6rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--mid);
+            padding: 6px 16px;
+            border: 1px solid rgba(0, 119, 182, .1);
+            border-radius: 100px;
+            background: rgba(255, 255, 255, .7);
+            backdrop-filter: blur(10px);
+            margin-bottom: 8px
+        }
+
+        .sv-hd .badge svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .sv-hd h2 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            margin-bottom: 4px
+        }
+
+        .sv-hd p {
+            font-size: .85rem;
+            color: var(--muted);
+            max-width: 420px;
+            margin: 0 auto;
+            line-height: 1.7
+        }
+
+        .sv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .sv-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, .6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, .8);
+            padding: 16px 18px 14px;
+            transition: all .55s cubic-bezier(.22, 1, .36, 1);
+            cursor: default;
+            opacity: 0;
+            transform: translateY(30px)
+        }
+
+        .sv-card.vis {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .sv-card:nth-child(1) {
+            transition-delay: .05s
+        }
+
+        .sv-card:nth-child(2) {
+            transition-delay: .15s
+        }
+
+        .sv-card:nth-child(3) {
+            transition-delay: .25s
+        }
+
+        .sv-card:nth-child(4) {
+            transition-delay: .35s
+        }
+
+        .sv-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 20%, rgba(0, 180, 216, .06), transparent 60%);
+            opacity: 0;
+            transition: opacity .5s;
+            pointer-events: none
+        }
+
+        .sv-card:hover::before {
+            opacity: 1
+        }
+
+        .sv-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--mid));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .5s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .sv-card:hover::after {
+            transform: scaleX(1)
+        }
+
+        .sv-card:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 20px 60px rgba(0, 119, 182, .08), 0 0 0 1px rgba(0, 180, 216, .1);
+            border-color: rgba(0, 180, 216, .15);
+            background: rgba(255, 255, 255, .85)
+        }
+
+        .sv-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px
+        }
+
+        .sv-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #e8f4fd, #d4eaf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .5s cubic-bezier(.22, 1, .36, 1);
+            position: relative
+        }
+
+        .sv-ico::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(0, 180, 216, .08);
+            animation: icoBreath 3.5s ease-in-out infinite
+        }
+
+        @keyframes icoBreath {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: .4
+            }
+
+            50% {
+                transform: scale(1.08);
+                opacity: .8
+            }
+        }
+
+        .sv-card:hover .sv-ico {
+            background: linear-gradient(135deg, var(--cyan), var(--mid));
+            box-shadow: 0 8px 24px rgba(0, 180, 216, .2);
+            transform: scale(1.08) rotate(-4deg)
+        }
+
+        .sv-card:hover .sv-ico::after {
+            border-color: rgba(0, 180, 216, .2);
+            animation-duration: 1.5s
+        }
+
+        .sv-ico svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--mid);
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all .35s
+        }
+
+        .sv-card:hover .sv-ico svg {
+            stroke: #fff
+        }
+
+        .sv-lbl {
+            font-family: 'Montserrat', sans-serif;
+            font-size: .55rem;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 2px
+        }
+
+        .sv-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: .95rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.15
+        }
+
+        .sv-name .em {
+            color: var(--cyan);
+            font-style: normal
+        }
+
+        .sv-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 8px;
+            background: rgba(0, 180, 216, .05);
+            border: 1px solid rgba(0, 180, 216, .06);
+            font-family: 'Montserrat', sans-serif;
+            font-size: .62rem;
+            font-weight: 800;
+            color: var(--mid);
+            margin-bottom: 4px;
+            transition: all .4s
+        }
+
+        .sv-stat svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .sv-stat .ctr {
+            font-variant-numeric: tabular-nums
+        }
+
+        .sv-card:hover .sv-stat {
+            background: rgba(0, 180, 216, .09);
+            border-color: rgba(0, 180, 216, .12)
+        }
+
+        .sv-desc {
+            font-size: .75rem;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-bottom: 8px
+        }
+
+        .sv-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px
+        }
+
+        .stag {
+            padding: 5px 11px 5px 8px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, .85), rgba(240, 248, 255, .7));
+            border: 1px solid rgba(0, 180, 216, .1);
+            font-family: 'Montserrat', sans-serif;
+            font-size: .58rem;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all .35s cubic-bezier(.22, 1, .36, 1);
+            opacity: 0;
+            transform: translateY(8px);
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .stag::before {
+            content: '+';
+            font-size: .55rem;
+            color: var(--cyan);
+            font-weight: 800;
+            display: inline-block;
+            transition: transform .3s
+        }
+
+        .stag:hover::before {
+            transform: rotate(90deg)
+        }
+
+        .stag::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, rgba(0, 180, 216, .15), rgba(0, 119, 182, .1));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity .3s
+        }
+
+        .sv-card.vis .stag {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .sv-card.vis .stag:nth-child(1) {
+            transition-delay: .3s
+        }
+
+        .sv-card.vis .stag:nth-child(2) {
+            transition-delay: .4s
+        }
+
+        .sv-card.vis .stag:nth-child(3) {
+            transition-delay: .5s
+        }
+
+        .stag:hover {
+            border-color: rgba(0, 180, 216, .25);
+            background: white;
+            color: var(--mid);
+            box-shadow: 0 4px 16px rgba(0, 180, 216, .12);
+            transform: translateY(-3px) scale(1.04) !important
+        }
+
+        .stag:hover::after {
+            opacity: 1
+        }
+
+        @keyframes tagPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 180, 216, .15)
+            }
+
+            50% {
+                box-shadow: 0 0 0 4px rgba(0, 180, 216, 0)
+            }
+        }
+
+        .sv-card.vis .stag {
+            animation: tagPulse 2.5s ease-out 1.5s 1
+        }
+
+        .pop-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(3, 4, 94, .15);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s
+        }
+
+        .pop-overlay.on {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        .pop {
+            position: fixed;
+            z-index: 9999;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(.9);
+            width: 340px;
+            max-width: 90vw;
+            background: rgba(255, 255, 255, .95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 180, 216, .1);
+            border-radius: 18px;
+            padding: 28px 26px 24px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .1), 0 0 0 1px rgba(255, 255, 255, .5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all .35s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .pop.on {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1)
+        }
+
+        .pop::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--mid));
+            border-radius: 18px 18px 0 0
+        }
+
+        .pop-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .3s;
+            font-size: 14px;
+            color: var(--muted)
+        }
+
+        .pop-close:hover {
+            background: rgba(0, 180, 216, .1);
+            color: var(--mid)
+        }
+
+        .pop-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+            padding-right: 30px
+        }
+
+        .pop-title .em {
+            color: var(--cyan);
+            font-style: normal
+        }
+
+        .pop-body {
+            font-size: .85rem;
+            color: var(--muted);
+            line-height: 1.7
+        }
+
+        @media(max-width:1050px) {
+            .services {
+                height: auto;
+                min-height: 100vh;
+                padding: 60px 16px
+            }
+
+            .sv-grid {
+                grid-template-columns: 1fr
+            }
+
+            .sv-orb.o1 {
+                width: 400px;
+                height: 400px
+            }
+
+            .sv-orb.o2 {
+                width: 280px;
+                height: 280px
+            }
+
+            .sv-orb.o3 {
+                width: 160px;
+                height: 160px
+            }
+        }
+
+        @media(max-width:600px) {
+            .sv-name {
+                font-size: .9rem
+            }
+
+            .sv-card {
+                padding: 14px 14px 12px
+            }
+
+            .sv-hd h2 {
+                font-size: 1.3rem
+            }
+
+            .sv-hd {
+                margin-bottom: 16px
+            }
+        }
+
+        .rv {
+            opacity: 0;
+            transform: translateY(45px);
+            transition: all 1s cubic-bezier(.22, 1, .36, 1)
+        }
+
+        .rv.vis {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .rv.d1 {
+            transition-delay: .15s
+        }
+    </style>
 </head>
 
 <body>
@@ -146,81 +1772,151 @@
         </a>
     </header>
 
-    <!-- Notre Mission Section (Premium) -->
-    <section id="mission" class="section-padding mission-section gradient-section gradient-white-to-light">
-        <div class="container">
-            <div class="mission-header text-center fade-in-scroll">
-                <span class="section-tag"><i data-lucide="target"></i> Notre Raison d'Être</span>
-                <h2>Notre <span class="text-gradient">Mission</span></h2>
-                <p class="mission-subtitle">Accompagner nos clients avec <strong>rigueur</strong>,
-                    <strong>respect</strong> et <strong>intégrité</strong>.
-                </p>
-            </div>
-
-            <div class="mission-cards">
-                <!-- Card 1 -->
-                <div class="mission-card fade-in-scroll">
-                    <div class="mission-icon">
-                        <i data-lucide="puzzle"></i>
-                    </div>
-                    <h4>Stratégies personnalisées</h4>
-                    <p>Des solutions financières <span class="highlight">sur mesure</span>, adaptées à vos objectifs et
-                        <span class="highlight">durables</span> dans le temps.
-                    </p>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="mission-card fade-in-scroll delay-1">
-                    <div class="mission-icon">
-                        <i data-lucide="headphones"></i>
-                    </div>
-                    <h4>Écoute et suivi</h4>
-                    <p>Au-delà des produits, nous priorisons l'<span class="highlight">écoute attentive</span> et un
-                        <span class="highlight">accompagnement continu</span>.
-                    </p>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="mission-card fade-in-scroll delay-2">
-                    <div class="mission-icon">
-                        <i data-lucide="scale"></i>
-                    </div>
-                    <h4>Conseils impartiaux</h4>
-                    <p>Des recommandations <span class="highlight">objectives</span>, centrées uniquement sur <span
-                            class="highlight">vos intérêts</span>.</p>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="mission-card fade-in-scroll">
-                    <div class="mission-icon">
-                        <i data-lucide="eye"></i>
-                    </div>
-                    <h4>Transparence</h4>
-                    <p>Une approche <span class="highlight">claire et accessible</span>, sans jargon inutile.</p>
-                </div>
-
-                <!-- Card 5 -->
-                <div class="mission-card fade-in-scroll delay-1">
-                    <div class="mission-icon">
-                        <i data-lucide="heart-handshake"></i>
-                    </div>
-                    <h4>Engagement à long terme</h4>
-                    <p>Notre vision : être votre <span class="highlight">référence locale</span> en services financiers.
-                    </p>
+    <!-- NEW Mission Section (Premium Prism) -->
+    <section class="mission">
+        <div class="m-bg">
+            <div class="bl b1"></div>
+            <div class="bl b2"></div>
+        </div>
+        <div class="m-grid"></div>
+        <div class="m-badge-top rv">
+            <div class="badge"><svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="22" y1="12" x2="18" y2="12" />
+                    <line x1="6" y1="12" x2="2" y2="12" />
+                    <line x1="12" y1="6" x2="12" y2="2" />
+                    <line x1="12" y1="22" x2="12" y2="18" />
+                </svg> Notre Mission</div>
+        </div>
+        <div class="m-wrap">
+            <div class="m-txt rv">
+                <div class="bigN" id="bN">01</div>
+                <h2 id="mT">Stratégies taillées<br><span class="em">sur mesure</span></h2>
+                <p class="desc" id="mD">Notre mission est d'offrir une gestion de portefeuille entièrement
+                    personnalisée, construite autour des ambitions et de la réalité de chacun.</p>
+                <div class="mnav">
+                    <div class="mdot on" data-i="0"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.61 1.61a2.404 2.404 0 0 1-1.705.707 2.402 2.402 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.877l-1.568-1.568A2.402 2.402 0 0 1 1.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 1 0 3.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0 1 12 2c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02Z" />
+                        </svg></div>
+                    <div class="dsep"></div>
+                    <div class="mdot" data-i="1"><svg viewBox="0 0 24 24">
+                            <path d="M6 9a6 6 0 0 1 12 0c0 7-6 8-6 13" />
+                            <path d="M14 9a2 2 0 0 0-4 0c0 2 3 3 3 5" />
+                        </svg></div>
+                    <div class="dsep"></div>
+                    <div class="mdot" data-i="2"><svg viewBox="0 0 24 24">
+                            <path
+                                d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+                        </svg></div>
+                    <div class="dsep"></div>
+                    <div class="mdot" data-i="3"><svg viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg></div>
+                    <div class="dsep"></div>
+                    <div class="mdot" data-i="4"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                        </svg></div>
                 </div>
             </div>
-
-            <div class="mission-cta text-center fade-in-scroll">
-                <a href="#equipe" class="btn-primary"><i data-lucide="users"></i> Rencontrer l'équipe</a>
+            <div class="prism-stage rv d1">
+                <div class="p-aura"></div>
+                <div class="p-shadow"></div>
+                <div class="p-float">
+                    <div class="prism" id="prism">
+                        <div class="pf">
+                            <div class="pf-border"></div>
+                            <div class="pf-tint"></div>
+                            <div class="pf-tl"></div>
+                            <div class="pf-br"></div><span class="pf-n">01</span>
+                            <div class="pf-ic"><svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.61 1.61a2.404 2.404 0 0 1-1.705.707 2.402 2.402 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.877l-1.568-1.568A2.402 2.402 0 0 1 1.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 1 0 3.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0 1 12 2c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02Z" />
+                                </svg></div>
+                            <h3>Stratégies <span class="glow">personnalisées</span></h3>
+                            <p>Une allocation adaptée à votre profil de risque, une diversification <span
+                                    class="glow">réfléchie</span> et des ajustements continus selon votre situation.</p>
+                            <div class="pf-tag"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg> Sur mesure</div>
+                        </div>
+                        <div class="pf">
+                            <div class="pf-border"></div>
+                            <div class="pf-tint"></div>
+                            <div class="pf-tl"></div>
+                            <div class="pf-br"></div><span class="pf-n">02</span>
+                            <div class="pf-ic"><svg viewBox="0 0 24 24">
+                                    <path d="M6 9a6 6 0 0 1 12 0c0 7-6 8-6 13" />
+                                    <path d="M14 9a2 2 0 0 0-4 0c0 2 3 3 3 5" />
+                                </svg></div>
+                            <h3>Accompagnement <span class="glow">continu</span></h3>
+                            <p>Des rencontres régulières, un suivi structuré et une disponibilité <span
+                                    class="glow">réelle</span> à chaque étape de votre parcours financier.</p>
+                            <div class="pf-tag"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg> Suivi constant</div>
+                        </div>
+                        <div class="pf">
+                            <div class="pf-border"></div>
+                            <div class="pf-tint"></div>
+                            <div class="pf-tl"></div>
+                            <div class="pf-br"></div><span class="pf-n">03</span>
+                            <div class="pf-ic"><svg viewBox="0 0 24 24">
+                                    <path
+                                        d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+                                </svg></div>
+                            <h3>Allocation <span class="glow">structurée</span></h3>
+                            <p>Diversification stratégique, gestion active du risque et ajustements continus pour
+                                préserver <span class="glow">l'équilibre</span> dans le temps.</p>
+                            <div class="pf-tag"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg> Gestion du risque</div>
+                        </div>
+                        <div class="pf">
+                            <div class="pf-border"></div>
+                            <div class="pf-tint"></div>
+                            <div class="pf-tl"></div>
+                            <div class="pf-br"></div><span class="pf-n">04</span>
+                            <div class="pf-ic"><svg viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg></div>
+                            <h3>Information <span class="glow">accessible</span></h3>
+                            <p>Des explications structurées, des suivis réguliers et une vision <span
+                                    class="glow">claire</span> de l'évolution de votre portefeuille.</p>
+                            <div class="pf-tag"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg> Clarté totale</div>
+                        </div>
+                        <div class="pf">
+                            <div class="pf-border"></div>
+                            <div class="pf-tint"></div>
+                            <div class="pf-tl"></div>
+                            <div class="pf-br"></div><span class="pf-n">05</span>
+                            <div class="pf-ic"><svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                                </svg></div>
+                            <h3>Vision à <span class="glow">long terme</span></h3>
+                            <p>Une relation construite sur la constance, l'anticipation et une planification pensée pour
+                                <span class="glow">évoluer</span> avec le temps.
+                            </p>
+                            <div class="pf-tag"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg> Long terme</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Vapor Fog Divider -->
-    <div class="chameleon-divider" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">
+    <div class="cham" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
             <defs>
-                <linearGradient id="vapor-gradient-1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <linearGradient id="vg1" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" style="stop-color:#b8d4e8">
                         <animate attributeName="stop-color" values="#b8d4e8;#5fa8d3;#0077b6;#b8d4e8" dur="15s"
                             repeatCount="indefinite" />
@@ -235,166 +1931,136 @@
                     </stop>
                 </linearGradient>
             </defs>
-            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-1)"
-                fill="none" stroke-width="8" />
-            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-1)"
-                fill="none" stroke-width="6" />
-            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-1)"
-                fill="none" stroke-width="4" />
+            <path class="cw cw1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vg1)" fill="none" stroke-width="8" />
+            <path class="cw cw2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vg1)" fill="none" stroke-width="6" />
+            <path class="cw cw3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vg1)" fill="none" stroke-width="4" />
         </svg>
-        <!-- Floating particles -->
-        <div class="particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <!-- Left side particles -->
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <!-- Right side particles -->
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-        </div>
-        <!-- Scroll indicator -->
-        <div class="scroll-indicator">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
+        <div class="pts">
+            <div class="pt"></div>
+            <div class="pt"></div>
+            <div class="pt"></div>
+            <div class="pt"></div>
+            <div class="pt"></div>
+            <div class="pt"></div>
+            <div class="ptl"></div>
+            <div class="ptl"></div>
+            <div class="ptl"></div>
+            <div class="ptr"></div>
+            <div class="ptr"></div>
+            <div class="ptr"></div>
         </div>
     </div>
 
-    <!-- Services Section -->
-    <section id="services" class="section-padding gradient-section gradient-light">
-        <div class="container">
-            <div class="mission-header text-center fade-in-scroll">
-                <span class="section-tag"><i data-lucide="briefcase"></i> Nos Services</span>
-                <h2>Nos Champs <span class="text-gradient">d'Expertise</span></h2>
-                <p class="mission-subtitle">Une approche globale pour bâtir, protéger et transmettre votre patrimoine.
-                </p>
+    <section class="services" id="services">
+        <div class="sv-orbs">
+            <div class="sv-orb o1">
+                <div class="sv-orb-dot"></div>
             </div>
+            <div class="sv-orb o2">
+                <div class="sv-orb-dot"></div>
+            </div>
+            <div class="sv-orb o3">
+                <div class="sv-orb-dot"></div>
+            </div>
+        </div>
+        <div class="sv-blob b1"></div>
+        <div class="sv-blob b2"></div>
 
-            <div class="services-layout">
-                <!-- LEFT: Accordion List -->
-                <div class="services-accordion">
-                    <div class="accordion-item active"
-                        data-image="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80">
-                        <div class="accordion-header">
-                            <h3><span class="accordion-icon"><i data-lucide="bar-chart-3"></i></span>Portefeuille
-                                Personnalisé</h3>
-                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
-                        </div>
-                        <div class="accordion-body">
-                            <p>Une gestion discrétionnaire active, basée sur votre tolérance au risque et les cycles
-                                économiques, pour maximiser le rendement tout en préservant le capital.</p>
-                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
-                        </div>
-                    </div>
-                    <div class="accordion-item"
-                        data-image="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80">
-                        <div class="accordion-header">
-                            <h3><span class="accordion-icon"><i data-lucide="shield-check"></i></span>Stratégies
-                                Fiscales</h3>
-                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
-                        </div>
-                        <div class="accordion-body">
-                            <p>Analyse approfondie de vos revenus, optimisation des comptes (REER/CELI/CRI) et
-                                structures corporatives pour minimiser l'impact fiscal.</p>
-                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
+        <div class="sv-wrap">
+            <div class="sv-hd rv">
+                <div class="badge"><svg viewBox="0 0 24 24">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </svg> Nos Services</div>
+                <h2>Nos Champs <span class="shimmer">d'Expertise</span></h2>
+            </div>
+            <div class="sv-grid">
+                <div class="sv-card">
+                    <div class="sv-top">
+                        <div class="sv-ico"><svg viewBox="0 0 24 24">
+                                <path d="M3 3v18h18" />
+                                <path d="m19 9-5 5-4-4-3 3" />
+                            </svg></div>
+                        <div>
+                            <div class="sv-lbl">Service 01</div>
+                            <div class="sv-name">Portefeuille <span class="em">Personnalisé</span></div>
                         </div>
                     </div>
-                    <div class="accordion-item"
-                        data-image="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&q=80">
-                        <div class="accordion-header">
-                            <h3><span class="accordion-icon"><i data-lucide="landmark"></i></span>Planification
-                                Successorale</h3>
-                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
-                        </div>
-                        <div class="accordion-body">
-                            <p>Mise en place de fiducies, gels successoraux et transferts pour protéger vos héritiers et
-                                la pérennité de vos actifs familiaux.</p>
-                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
-                        </div>
-                    </div>
-                    <div class="accordion-item"
-                        data-image="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80">
-                        <div class="accordion-header">
-                            <h3><span class="accordion-icon"><i data-lucide="sunset"></i></span>Planification de
-                                Retraite</h3>
-                            <button class="accordion-toggle" aria-label="Toggle"><i data-lucide="plus"></i></button>
-                        </div>
-                        <div class="accordion-body">
-                            <p>Projections financières, stratégies de décaissement et optimisation des rentes pour une
-                                indépendance financière durable.</p>
-                            <a href="#" class="accordion-link">En savoir plus <i data-lucide="arrow-up-right"></i></a>
-                        </div>
-                    </div>
+                    <div class="sv-tags"><span class="stag"
+                            data-tip="Suivi quotidien des marchés et ajustements tactiques pour maximiser vos rendements.">Gestion
+                            active</span><span class="stag"
+                            data-tip="Répartition optimale entre actions, obligations et placements alternatifs selon les conditions du marché.">Allocation
+                            dynamique</span><span class="stag"
+                            data-tip="Relevés trimestriels clairs avec analyse de performance et perspectives.">Rapports
+                            détaillés</span></div>
                 </div>
-
-                <!-- RIGHT: Featured Image -->
-                <div class="services-image">
-                    <img id="services-featured-img"
-                        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
-                        alt="Service Image">
-                    <a href="#contact" class="image-cta btn">Obtenez une consultation <i
-                            data-lucide="arrow-up-right"></i></a>
+                <div class="sv-card">
+                    <div class="sv-top">
+                        <div class="sv-ico"><svg viewBox="0 0 24 24">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg></div>
+                        <div>
+                            <div class="sv-lbl">Service 02</div>
+                            <div class="sv-name">Stratégies <span class="em">Fiscales</span></div>
+                        </div>
+                    </div>
+                    <div class="sv-tags"><span class="stag"
+                            data-tip="Maximisez vos cotisations REER, CELI et CRI pour réduire votre fardeau fiscal.">REER
+                            / CELI / CRI</span><span class="stag"
+                            data-tip="Holdings, fiducies et sociétés de gestion pour optimiser la fiscalité de votre entreprise.">Structures
+                            corporatives</span><span class="stag"
+                            data-tip="Analyse complète de votre situation fiscale chaque année avec recommandations personnalisées.">Revue
+                            annuelle</span></div>
+                </div>
+                <div class="sv-card">
+                    <div class="sv-top">
+                        <div class="sv-ico"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg></div>
+                        <div>
+                            <div class="sv-lbl">Service 03</div>
+                            <div class="sv-name">Planification <span class="em">Successorale</span></div>
+                        </div>
+                    </div>
+                    <div class="sv-tags"><span class="stag"
+                            data-tip="Technique permettant de transférer la plus-value future de vos actifs à la prochaine génération.">Gels
+                            successoraux</span><span class="stag"
+                            data-tip="Structures juridiques pour protéger et distribuer vos actifs selon vos volontés.">Fiducies
+                            familiales</span><span class="stag"
+                            data-tip="Accompagnement complet pour la vente ou le transfert de votre entreprise à vos héritiers.">Transfert
+                            d&#39;entreprise</span></div>
+                </div>
+                <div class="sv-card">
+                    <div class="sv-top">
+                        <div class="sv-ico"><svg viewBox="0 0 24 24">
+                                <path d="M17 18a5 5 0 0 0-10 0" />
+                                <line x1="12" y1="9" x2="12" y2="2" />
+                                <polyline points="8 6 12 2 16 6" />
+                            </svg></div>
+                        <div>
+                            <div class="sv-lbl">Service 04</div>
+                            <div class="sv-name">Planification de <span class="em">Retraite</span></div>
+                        </div>
+                    </div>
+                    <div class="sv-tags"><span class="stag"
+                            data-tip="Simulations détaillées de vos revenus de retraite selon différents scénarios.">Projections
+                            sur mesure</span><span class="stag"
+                            data-tip="Stratégie optimale pour retirer de vos comptes en minimisant l&#39;impôt.">Décaissement
+                            optimal</span><span class="stag"
+                            data-tip="Coordination de toutes vos sources de revenus gouvernementales et privées.">RRQ,
+                            PSV et rentes</span></div>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Vapor Fog Divider -->
-    <div class="chameleon-divider"
-        onclick="document.getElementById('cycle-economique').scrollIntoView({behavior: 'smooth'})">
-        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
-            <defs>
-                <linearGradient id="vapor-gradient-2" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#5fa8d3">
-                        <animate attributeName="stop-color" values="#5fa8d3;#0077b6;#b8d4e8;#5fa8d3" dur="18s"
-                            repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="50%" style="stop-color:#0077b6">
-                        <animate attributeName="stop-color" values="#0077b6;#b8d4e8;#5fa8d3;#0077b6" dur="18s"
-                            repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="100%" style="stop-color:#b8d4e8">
-                        <animate attributeName="stop-color" values="#b8d4e8;#5fa8d3;#0077b6;#b8d4e8" dur="18s"
-                            repeatCount="indefinite" />
-                    </stop>
-                </linearGradient>
-            </defs>
-            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-2)"
-                fill="none" stroke-width="8" />
-            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-2)"
-                fill="none" stroke-width="6" />
-            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-2)"
-                fill="none" stroke-width="4" />
-        </svg>
-        <div class="particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <!-- Left side particles -->
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <!-- Right side particles -->
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-        </div>
-        <div class="scroll-indicator">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
-        </div>
+    <div class="pop-overlay" id="popOverlay"></div>
+    <div class="pop" id="pop"><button class="pop-close" id="popClose">✕</button>
+        <div class="pop-title" id="popTitle"></div>
+        <div class="pop-body" id="popBody"></div>
     </div>
+
 
     <!-- Cycle Économique Interactive Section V5 (SHARP) -->
     <section id="cycle-economique" class="section-padding gradient-section gradient-light-to-cyan">
@@ -1771,6 +3437,58 @@
     </script>
     <script src="./js/conversion.js"></script>
     <script src="./js/marches-v2.js"></script>
+    <script>
+        /* === PART3 JS — Prism + Scroll + Counters + Popup === */
+        (function () {
+            const data = [
+                { n: '01', t: 'Stratégies taillées<br><span class="em">sur mesure</span>', d: 'Notre mission est d\'offrir une gestion de portefeuille entièrement personnalisée, construite autour des ambitions et de la réalité de chacun.' },
+                { n: '02', t: 'Accompagnement<br><span class="em">continu</span>', d: 'Des rencontres régulières, un suivi structuré et une disponibilité réelle à chaque étape de votre parcours financier.' },
+                { n: '03', t: 'Allocation<br><span class="em">structurée</span>', d: 'Diversification stratégique, gestion active du risque et ajustements continus pour préserver l\'équilibre dans le temps.' },
+                { n: '04', t: 'Information<br><span class="em">accessible</span>', d: 'Des explications structurées, des suivis réguliers et une vision claire de l\'évolution de votre portefeuille.' },
+                { n: '05', t: 'Vision à<br><span class="em">long terme</span>', d: 'Une relation construite sur la constance, l\'anticipation et une planification pensée pour évoluer avec le temps.' }
+            ];
+            const prism = document.getElementById('prism');
+            const dots = document.querySelectorAll('.mdot');
+            const bN = document.getElementById('bN');
+            const mT = document.getElementById('mT');
+            const mD = document.getElementById('mD');
+            let cur = 0, auto;
+            function go(i) {
+                cur = i;
+                if (prism) prism.style.transform = 'rotateY(' + (i * -72) + 'deg)';
+                dots.forEach((d, idx) => { d.classList.toggle('on', idx === i) });
+                if (bN) bN.textContent = data[i].n;
+                if (mT) mT.innerHTML = data[i].t;
+                if (mD) mD.textContent = data[i].d;
+            }
+            dots.forEach(d => { d.addEventListener('click', () => { go(+d.dataset.i); clearInterval(auto); auto = setInterval(() => go((cur + 1) % 5), 6000) }) });
+            auto = setInterval(() => go((cur + 1) % 5), 6000);
+
+            /* Scroll reveal */
+            const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis') }) }, { threshold: .15 });
+            document.querySelectorAll('.rv,.sv-card,.stag').forEach(el => io.observe(el));
+
+            /* Popup */
+            const ov = document.getElementById('popOverlay');
+            const pop = document.getElementById('pop');
+            const pT = document.getElementById('popTitle');
+            const pB = document.getElementById('popBody');
+            const pC = document.getElementById('popClose');
+            function openP(tag) {
+                const card = tag.closest('.sv-card');
+                const name = card ? card.querySelector('.sv-name') : null;
+                if (pT) pT.innerHTML = name ? name.innerHTML : tag.textContent;
+                if (pB) pB.textContent = tag.dataset.tip || '';
+                if (ov) ov.classList.add('on');
+                if (pop) pop.classList.add('on');
+            }
+            function closeP() { if (ov) ov.classList.remove('on'); if (pop) pop.classList.remove('on') }
+            document.querySelectorAll('.stag').forEach(t => t.addEventListener('click', () => openP(t)));
+            if (pC) pC.addEventListener('click', closeP);
+            if (ov) ov.addEventListener('click', closeP);
+        })();
+    </script>
+
     <!-- ============================================
      COMPOSANTE 1 : BOUTON FLOTTANT PERMANENT
      ============================================ -->
