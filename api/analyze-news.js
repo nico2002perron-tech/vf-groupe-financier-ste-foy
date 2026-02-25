@@ -300,17 +300,13 @@ module.exports = async function handler(req, res) {
             }
         }
 
-        // 7. Retourner selon le secteur demandé
+        // 7. Retourner selon le secteur demandé (max 3 articles)
         let responseArticles;
         if (sector === 'all') {
-            // Pour "all" : prendre les plus récents de tous les secteurs, max 8
-            responseArticles = allClassified.slice(0, 8);
+            responseArticles = allClassified.slice(0, 3);
         } else {
-            responseArticles = classified[sector] || [];
+            responseArticles = (classified[sector] || []).slice(0, 3);
         }
-
-        // Toujours au moins 3
-        responseArticles = responseArticles.slice(0, 8);
 
         return res.status(200).json({
             success: true,
