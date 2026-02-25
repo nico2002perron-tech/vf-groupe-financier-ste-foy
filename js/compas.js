@@ -1,13 +1,17 @@
 /* =========================================
-   COMPAS PATRIMONIAL I.A. — ENGINE V3
+   COMPAS PATRIMONIAL I.A. — ENGINE V4
    Calculator · AI Text · SVG Chart
    Questionnaire · Tooltips · Cycle-Linked
-   3 Scenarios · Probability Cone · Goal
-   PDF Export
+   3 Scenarios · Monte Carlo · Goal
+   Contributions · Inflation · PDF Export
    ========================================= */
 
 (function () {
     'use strict';
+
+    // ── Constants ──
+    const INFLATION_RATE = 0.02;
+    const MC_NUM_SIMS = 500;
 
     // ── Cycle Phase Data ──
     const CYCLE_DATA = {
@@ -58,6 +62,7 @@
         prudent: {
             name: 'Prudent',
             baseReturn: 0.045,
+            volatility: 0.06,
             emoji: '🛡️',
             adjective: 'conservatrice',
             color: '#10b981',
@@ -66,6 +71,7 @@
         equilibre: {
             name: 'Équilibré',
             baseReturn: 0.065,
+            volatility: 0.12,
             emoji: '⚖️',
             adjective: 'équilibrée',
             color: '#0077b6',
@@ -74,6 +80,7 @@
         croissance: {
             name: 'Croissance',
             baseReturn: 0.085,
+            volatility: 0.18,
             emoji: '🚀',
             adjective: 'dynamique',
             color: '#f59e0b',
@@ -139,10 +146,15 @@
     let state = {
         amount: 100000,
         horizon: 15,
+        contribution: 0,
+        adjustInflation: false,
         profile: 'equilibre',
         cycle: 'expansion',
         goalAmount: null
     };
+
+    // Cached MC results for use in analysis/PDF
+    let lastMcResults = null;
 
     let quizState = {
         currentQuestion: 0,
@@ -157,12 +169,15 @@
         els = {
             amountSlider: document.getElementById('compas-amount'),
             amountValue: document.getElementById('compas-amount-value'),
+            contributionSlider: document.getElementById('compas-contribution'),
+            contributionValue: document.getElementById('compas-contribution-value'),
             horizonSlider: document.getElementById('compas-horizon'),
             horizonValue: document.getElementById('compas-horizon-value'),
             goalSlider: document.getElementById('compas-goal'),
             goalValue: document.getElementById('compas-goal-value'),
             goalBadge: document.getElementById('goal-badge'),
             goalBadgeText: document.getElementById('goal-badge-text'),
+            inflationToggle: document.getElementById('compas-inflation-toggle'),
             profileBtns: document.querySelectorAll('.profile-btn'),
             chartSvg: document.getElementById('compas-svg-chart'),
             bigNumber: document.getElementById('compas-big-number'),
@@ -198,6 +213,12 @@
         // Event listeners
         els.amountSlider.addEventListener('input', onAmountChange);
         els.horizonSlider.addEventListener('input', onHorizonChange);
+        if (els.contributionSlider) {
+            els.contributionSlider.addEventListener('input', onContributionChange);
+        }
+        if (els.inflationToggle) {
+            els.inflationToggle.addEventListener('change', onInflationToggle);
+        }
         if (els.goalSlider) {
             els.goalSlider.addEventListener('input', onGoalChange);
         }
@@ -288,6 +309,17 @@
         update();
     }
 
+    function onContributionChange(e) {
+        state.contribution = parseInt(e.target.value);
+        if (state.contribution === 0) {
+            els.contributionValue.textContent = '0 $ / mois';
+        } else {
+            els.contributionValue.textContent = formatCurrency(state.contribution) + ' / mois';
+        }
+        updateSliderFill(e.target);
+        update();
+    }
+
     function onHorizonChange(e) {
         state.horizon = parseInt(e.target.value);
         els.horizonValue.textContent = state.horizon + ' ans';
@@ -308,6 +340,11 @@
         update();
     }
 
+    function onInflationToggle() {
+        state.adjustInflation = els.inflationToggle.checked;
+        update();
+    }
+
     function updateSliderFill(slider) {
         const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
         slider.style.background = `linear-gradient(90deg, #0077b6 ${pct}%, #e2ecf2 ${pct}%)`;
@@ -318,20 +355,30 @@
         const profile = PROFILES[profileKey];
         const cycle = CYCLE_DATA[state.cycle];
         const adjustedReturn = profile.baseReturn * cycle.returnModifier;
+        const annualContrib = state.contribution * 12;
 
         const points = [];
         let value = state.amount;
         for (let year = 0; year <= state.horizon; year++) {
-            points.push({ year, value: Math.round(value) });
-            const noise = 1 + (Math.sin(year * 1.7 + state.amount * 0.00001) * 0.02);
-            value *= (1 + adjustedReturn * noise);
+            let displayValue = value;
+            if (state.adjustInflation && year > 0) {
+                displayValue = value / Math.pow(1 + INFLATION_RATE, year);
+            }
+            points.push({ year, value: Math.round(displayValue) });
+
+            if (year < state.horizon) {
+                value += annualContrib;
+                const noise = 1 + (Math.sin(year * 1.7 + state.amount * 0.00001) * 0.02);
+                value *= (1 + adjustedReturn * noise);
+            }
         }
 
         const finalValue = points[points.length - 1].value;
-        const totalGain = finalValue - state.amount;
+        const totalContributions = annualContrib * state.horizon;
+        const totalGain = finalValue - state.amount - totalContributions;
         const annualReturn = adjustedReturn * 100;
 
-        return { points, finalValue, totalGain, annualReturn, adjustedReturn };
+        return { points, finalValue, totalGain, annualReturn, adjustedReturn, totalContributions };
     }
 
     function calculateAllProfiles() {
@@ -342,27 +389,67 @@
         return results;
     }
 
-    function calculateCone(adjustedReturn, horizon, amount) {
-        const optimistReturn = Math.min(adjustedReturn + 0.03, adjustedReturn * 1.8);
-        const pessimistReturn = Math.max(adjustedReturn - 0.03, 0.005);
+    // ── Monte Carlo Simulation ──
+    function runMonteCarlo(adjustedReturn, volatility, horizon, amount, monthlyContrib) {
+        const annualContrib = monthlyContrib * 12;
+        const matrix = [];
 
-        const optimiste = [];
-        const moyen = [];
-        const pessimiste = [];
-
-        let valOpt = amount, valMoy = amount, valPes = amount;
-        for (let year = 0; year <= horizon; year++) {
-            optimiste.push({ year, value: Math.round(valOpt) });
-            moyen.push({ year, value: Math.round(valMoy) });
-            pessimiste.push({ year, value: Math.round(valPes) });
-
-            const noise = 1 + (Math.sin(year * 1.7 + amount * 0.00001) * 0.02);
-            valOpt *= (1 + optimistReturn * noise);
-            valMoy *= (1 + adjustedReturn * noise);
-            valPes *= (1 + pessimistReturn * noise);
+        for (let s = 0; s < MC_NUM_SIMS; s++) {
+            const sim = [amount];
+            let val = amount;
+            for (let y = 1; y <= horizon; y++) {
+                val += annualContrib;
+                // Random normal via Box-Muller
+                const u1 = Math.random(), u2 = Math.random();
+                const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+                const yearReturn = adjustedReturn + volatility * z;
+                val *= (1 + yearReturn);
+                if (val < 0) val = 0;
+                sim.push(Math.round(val));
+            }
+            matrix.push(sim);
         }
 
-        return { optimiste, moyen, pessimiste };
+        const percentileData = { p10: [], p25: [], p50: [], p75: [], p90: [] };
+
+        for (let y = 0; y <= horizon; y++) {
+            const yearValues = matrix.map(sim => sim[y]).sort((a, b) => a - b);
+            percentileData.p10.push({ year: y, value: yearValues[Math.floor(MC_NUM_SIMS * 0.10)] });
+            percentileData.p25.push({ year: y, value: yearValues[Math.floor(MC_NUM_SIMS * 0.25)] });
+            percentileData.p50.push({ year: y, value: yearValues[Math.floor(MC_NUM_SIMS * 0.50)] });
+            percentileData.p75.push({ year: y, value: yearValues[Math.floor(MC_NUM_SIMS * 0.75)] });
+            percentileData.p90.push({ year: y, value: yearValues[Math.floor(MC_NUM_SIMS * 0.90)] });
+        }
+
+        // Apply inflation adjustment to percentiles if needed
+        if (state.adjustInflation) {
+            Object.keys(percentileData).forEach(pKey => {
+                percentileData[pKey] = percentileData[pKey].map(p => ({
+                    year: p.year,
+                    value: p.year > 0 ? Math.round(p.value / Math.pow(1 + INFLATION_RATE, p.year)) : p.value
+                }));
+            });
+        }
+
+        // Final values for stats (inflation-adjusted if needed)
+        const finalValues = matrix.map(s => {
+            let v = s[horizon];
+            if (state.adjustInflation) v = v / Math.pow(1 + INFLATION_RATE, horizon);
+            return Math.round(v);
+        }).sort((a, b) => a - b);
+
+        const totalInvested = amount + (annualContrib * horizon);
+        const probLoss = finalValues.filter(v => v < totalInvested).length / MC_NUM_SIMS;
+
+        return {
+            percentileData,
+            finalP10: finalValues[Math.floor(MC_NUM_SIMS * 0.10)],
+            finalP25: finalValues[Math.floor(MC_NUM_SIMS * 0.25)],
+            finalP50: finalValues[Math.floor(MC_NUM_SIMS * 0.50)],
+            finalP75: finalValues[Math.floor(MC_NUM_SIMS * 0.75)],
+            finalP90: finalValues[Math.floor(MC_NUM_SIMS * 0.90)],
+            probLoss: probLoss
+        };
     }
 
     function calculateGoalYear(points, goalAmount) {
@@ -381,18 +468,40 @@
         const cycle = CYCLE_DATA[state.cycle];
         const profile = PROFILES[state.profile];
 
-        // Calculate cone for active profile
-        const cone = calculateCone(activeResult.adjustedReturn, state.horizon, state.amount);
+        // Run Monte Carlo for active profile
+        const mcResults = runMonteCarlo(
+            activeResult.adjustedReturn,
+            profile.volatility,
+            state.horizon,
+            state.amount,
+            state.contribution
+        );
+        lastMcResults = mcResults;
 
         if (els.bigNumber) els.bigNumber.textContent = formatCurrency(activeResult.finalValue);
-        if (els.subtitle) els.subtitle.textContent = `Projection sur ${state.horizon} ans`;
+
+        // Subtitle with inflation note
+        if (els.subtitle) {
+            let subtitleText = `Projection sur ${state.horizon} ans`;
+            if (state.adjustInflation) subtitleText += ' (dollars d\'aujourd\'hui)';
+            els.subtitle.textContent = subtitleText;
+        }
+
+        // Gain stat — subtract contributions from gain
         if (els.statGain) els.statGain.textContent = formatCurrency(activeResult.totalGain);
-        if (els.statReturn) els.statReturn.textContent = activeResult.annualReturn.toFixed(1) + '%';
+
+        // Vague return range instead of precise %
+        if (els.statReturn) {
+            const lowReturn = Math.max(0, (activeResult.adjustedReturn - profile.volatility / 2) * 100);
+            const highReturn = (activeResult.adjustedReturn + profile.volatility / 2) * 100;
+            els.statReturn.textContent = Math.round(lowReturn) + '% — ' + Math.round(highReturn) + '%';
+        }
+
         if (els.statAlloc) els.statAlloc.textContent = cycle.allocation.actions + '% Actions';
 
-        drawChart(allResults, cone);
+        drawChart(allResults, mcResults);
         updateGoalBadge(activeResult.points);
-        generateAnalysis(activeResult, cycle, profile);
+        generateAnalysis(activeResult, cycle, profile, mcResults);
     }
 
     // ── Goal Badge ──
@@ -410,7 +519,6 @@
         if (goalResult.achieved) {
             els.goalBadge.className = 'goal-badge achieved';
             els.goalBadgeText.textContent = `Objectif atteint en ${goalResult.year} an${goalResult.year > 1 ? 's' : ''}`;
-            // Update lucide icon to check-circle
             const icon = els.goalBadge.querySelector('i, svg');
             if (icon) {
                 icon.setAttribute('data-lucide', 'check-circle');
@@ -428,14 +536,14 @@
     }
 
     // ── SVG Chart ──
-    function drawChart(allResults, cone) {
+    function drawChart(allResults, mcResults) {
         if (!els.chartSvg) return;
 
         const width = 600, height = 240;
         const padding = { top: 20, right: 20, bottom: 30, left: 10 };
         const chartBottom = height - padding.bottom;
 
-        // Find global min/max across all profiles + cone
+        // Find global min/max across all profiles + MC bands
         let globalMax = 0, globalMin = Infinity;
         PROFILE_KEYS.forEach(key => {
             allResults[key].points.forEach(p => {
@@ -443,10 +551,10 @@
                 if (p.value < globalMin) globalMin = p.value;
             });
         });
-        // Include cone bounds
-        if (cone) {
-            cone.optimiste.forEach(p => { if (p.value > globalMax) globalMax = p.value; });
-            cone.pessimiste.forEach(p => { if (p.value < globalMin) globalMin = p.value; });
+        // Include MC P10-P90 bounds
+        if (mcResults) {
+            mcResults.percentileData.p90.forEach(p => { if (p.value > globalMax) globalMax = p.value; });
+            mcResults.percentileData.p10.forEach(p => { if (p.value < globalMin) globalMin = p.value; });
         }
         // Include goal line in scale
         if (state.goalAmount) {
@@ -483,6 +591,29 @@
             return path;
         }
 
+        // Build a closed band path between two point arrays (upper forward, lower backward)
+        function buildBandPath(upperPoints, lowerPoints) {
+            // Forward along upper
+            let path = `M ${xScale(0)} ${yScale(upperPoints[0].value)}`;
+            for (let i = 1; i < upperPoints.length; i++) {
+                const x = xScale(i), y = yScale(upperPoints[i].value);
+                const prevX = xScale(i - 1), prevY = yScale(upperPoints[i - 1].value);
+                const cpx = (prevX + x) / 2;
+                path += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
+            }
+            // Backward along lower
+            const last = lowerPoints.length - 1;
+            path += ` L ${xScale(last)} ${yScale(lowerPoints[last].value)}`;
+            for (let i = last - 1; i >= 0; i--) {
+                const x = xScale(i), y = yScale(lowerPoints[i].value);
+                const nextX = xScale(i + 1), nextY = yScale(lowerPoints[i + 1].value);
+                const cpx = (nextX + x) / 2;
+                path += ` C ${cpx} ${nextY}, ${cpx} ${y}, ${x} ${y}`;
+            }
+            path += ' Z';
+            return path;
+        }
+
         // ── Grid Lines ──
         let gridLines = '';
         for (let i = 0; i < 4; i++) {
@@ -502,6 +633,7 @@
         }
 
         // ── Defs (gradients) ──
+        const activeColor = PROFILES[state.profile].color;
         let defs = '<defs>';
         PROFILE_KEYS.forEach(key => {
             const color = PROFILES[key].color;
@@ -511,46 +643,26 @@
                     <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
                 </linearGradient>`;
         });
-        // Cone gradient for active profile
-        const activeColor = PROFILES[state.profile].color;
+        // MC band gradients
         defs += `
-            <linearGradient id="cone-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.08"/>
+            <linearGradient id="mc-band-outer-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.06"/>
                 <stop offset="100%" stop-color="${activeColor}" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="mc-band-inner-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.12"/>
+                <stop offset="100%" stop-color="${activeColor}" stop-opacity="0.04"/>
             </linearGradient>`;
         defs += '</defs>';
 
-        // ── Cone (probability area) ──
-        let coneSvg = '';
-        if (cone) {
-            // Build path: go forward along optimiste, then backward along pessimiste
-            let conePath = `M ${xScale(0)} ${yScale(cone.optimiste[0].value)}`;
-            for (let i = 1; i < cone.optimiste.length; i++) {
-                const x = xScale(i), y = yScale(cone.optimiste[i].value);
-                const prevX = xScale(i - 1), prevY = yScale(cone.optimiste[i - 1].value);
-                const cpx = (prevX + x) / 2;
-                conePath += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
-            }
-            // Go backward along pessimiste
-            for (let i = cone.pessimiste.length - 1; i >= 1; i--) {
-                const x = xScale(i), y = yScale(cone.pessimiste[i].value);
-                const nextX = xScale(i - 1), nextY = yScale(cone.pessimiste[i - 1].value);
-                // Reverse bezier
-                const cpx = (x + nextX) / 2;
-                if (i === cone.pessimiste.length - 1) {
-                    conePath += ` L ${x} ${y}`;
-                }
-                conePath += ` C ${cpx} ${y}, ${cpx} ${nextY}, ${nextX} ${nextY}`;
-            }
-            conePath += ' Z';
-
-            coneSvg = `<path d="${conePath}" class="chart-cone" fill="url(#cone-grad)"/>`;
-
-            // Cone borders (dashed)
-            const optPath = buildLinePath(cone.optimiste);
-            const pesPath = buildLinePath(cone.pessimiste);
-            coneSvg += `<path d="${optPath}" class="chart-cone-border" stroke="${activeColor}"/>`;
-            coneSvg += `<path d="${pesPath}" class="chart-cone-border" stroke="${activeColor}"/>`;
+        // ── Monte Carlo Bands ──
+        let mcSvg = '';
+        if (mcResults) {
+            const pd = mcResults.percentileData;
+            // Outer band: P10 — P90
+            mcSvg += `<path d="${buildBandPath(pd.p90, pd.p10)}" class="chart-mc-band-outer" fill="url(#mc-band-outer-grad)"/>`;
+            // Inner band: P25 — P75
+            mcSvg += `<path d="${buildBandPath(pd.p75, pd.p25)}" class="chart-mc-band-inner" fill="url(#mc-band-inner-grad)"/>`;
         }
 
         // ── Profile Curves ──
@@ -609,23 +721,24 @@
         });
 
         // ── Assemble ──
-        els.chartSvg.innerHTML = defs + gridLines + coneSvg + curvesSvg + goalSvg + yearLabels + legendSvg;
+        els.chartSvg.innerHTML = defs + gridLines + mcSvg + curvesSvg + goalSvg + yearLabels + legendSvg;
     }
 
     // ── AI Text Engine ──
-    function generateAnalysis(result, cycle, profile) {
+    function generateAnalysis(result, cycle, profile, mcResults) {
         if (!els.aiText) return;
         els.aiText.style.opacity = '0';
         setTimeout(() => {
-            els.aiText.innerHTML = buildAnalysisText(result, cycle, profile);
+            els.aiText.innerHTML = buildAnalysisText(result, cycle, profile, mcResults);
             els.aiText.style.opacity = '1';
         }, 300);
     }
 
-    function buildAnalysisText(result, cycle, profile) {
+    function buildAnalysisText(result, cycle, profile, mcResults) {
         const amount = state.amount;
         const horizon = state.horizon;
-        const gain = result.totalGain;
+        const contribution = state.contribution;
+        const totalContributions = contribution * 12 * horizon;
 
         let opening;
         if (amount >= 500000 && horizon <= 7)
@@ -655,12 +768,30 @@
                 break;
         }
 
-        const multiplier = (result.finalValue / amount).toFixed(1);
-        let insight;
-        if (gain > amount)
-            insight = ` Votre capital initial de <strong>${formatCurrency(amount)}</strong> pourrait être multiplié par <strong>${multiplier}x</strong> en ${horizon} ans, atteignant <strong>${formatCurrency(result.finalValue)}</strong>.`;
-        else
-            insight = ` Avec un rendement annualisé de <strong>${result.annualReturn.toFixed(1)}%</strong>, votre patrimoine pourrait croître de <strong>${formatCurrency(gain)}</strong> sur ${horizon} ans.`;
+        // Monte Carlo insight (replaces precise return)
+        let mcInsight = '';
+        if (mcResults) {
+            mcInsight = ` Notre simulation de <strong>${MC_NUM_SIMS} scénarios</strong> indique que votre capital pourrait se situer entre <strong>${formatCurrency(mcResults.finalP10)}</strong> (scénario prudent) et <strong>${formatCurrency(mcResults.finalP90)}</strong> (scénario favorable) dans ${horizon} ans, avec une valeur médiane de <strong>${formatCurrency(mcResults.finalP50)}</strong>.`;
+
+            if (mcResults.probLoss > 0) {
+                const probPct = Math.round(mcResults.probLoss * 100);
+                mcInsight += ` La probabilité de ne pas récupérer votre mise totale sur cet horizon est de <strong>${probPct}%</strong>.`;
+            } else {
+                mcInsight += ` Sur cet horizon, aucun scénario simulé ne résulte en une perte en capital.`;
+            }
+        }
+
+        // Contributions insight
+        let contribInsight = '';
+        if (contribution > 0) {
+            contribInsight = ` Vos versements réguliers de <strong>${formatCurrency(contribution)}/mois</strong> contribuent <strong>${formatCurrency(totalContributions)}</strong> sur la période, amplifiant significativement l'effet des intérêts composés.`;
+        }
+
+        // Inflation note
+        let inflationNote = '';
+        if (state.adjustInflation) {
+            inflationNote = ' Ces projections sont exprimées <strong>en pouvoir d\'achat actuel</strong>, ajustées pour une inflation de 2%/an.';
+        }
 
         let closing;
         if (horizon >= 20)
@@ -670,7 +801,7 @@
         else
             closing = ' Une révision annuelle avec votre conseiller permettra d\'ajuster la stratégie au fil des cycles.';
 
-        return opening + cycleAnalysis + insight + closing;
+        return opening + cycleAnalysis + mcInsight + contribInsight + inflationNote + closing;
     }
 
     // ═══════════════════════════════════════
@@ -781,7 +912,7 @@
     }
 
     // ═══════════════════════════════════════
-    //  V3 — PDF EXPORT
+    //  V4 — PDF EXPORT (Enhanced)
     // ═══════════════════════════════════════
 
     function generatePDF() {
@@ -801,6 +932,7 @@
         var profile = PROFILES[state.profile];
         var cycle = CYCLE_DATA[state.cycle];
         var activeResult = calculateForProfile(state.profile);
+        var mcResults = lastMcResults;
         var today = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
 
         // ── Header ──
@@ -843,9 +975,13 @@
         doc.setFont(undefined, 'normal');
         doc.setTextColor(44, 74, 94);
 
+        // Vague return range for PDF
+        var lowRet = Math.max(0, Math.round((activeResult.adjustedReturn - profile.volatility / 2) * 100));
+        var highRet = Math.round((activeResult.adjustedReturn + profile.volatility / 2) * 100);
+
         var profileLines = [
             ['Profil de risque', profile.name],
-            ['Rendement annuel estime', activeResult.annualReturn.toFixed(1) + '%'],
+            ['Fourchette de rendement', lowRet + '% - ' + highRet + '%'],
             ['Cycle economique actif', cycle.name + ' (' + cycle.emoji + ')'],
             ['Strategie recommandee', cycle.strategy],
             ['Allocation', cycle.allocation.actions + '% Actions / ' + cycle.allocation.obligations + '% Obligations / ' + cycle.allocation.alternatif + '% Alternatif']
@@ -874,6 +1010,13 @@
             ['Montant initial', formatCurrency(state.amount)],
             ['Horizon de placement', state.horizon + ' ans']
         ];
+        if (state.contribution > 0) {
+            paramLines.push(['Contributions mensuelles', formatCurrency(state.contribution) + ' / mois']);
+            paramLines.push(['Total des contributions', formatCurrency(state.contribution * 12 * state.horizon)]);
+        }
+        if (state.adjustInflation) {
+            paramLines.push(['Ajustement inflation', '2% / an (dollars d\'aujourd\'hui)']);
+        }
         if (state.goalAmount) {
             paramLines.push(['Objectif financier', formatCurrency(state.goalAmount)]);
         }
@@ -923,12 +1066,47 @@
         });
         y += 6;
 
+        // ── Section: Monte Carlo Risk Analysis ──
+        if (mcResults) {
+            doc.setFontSize(13);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(10, 37, 64);
+            doc.text('Analyse de risque (Monte Carlo)', margin, y);
+            y += 8;
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(44, 74, 94);
+
+            var mcText = 'Basee sur ' + MC_NUM_SIMS + ' simulations aleatoires avec une volatilite de ' + Math.round(profile.volatility * 100) + '% :';
+            doc.text(mcText, margin, y);
+            y += 6;
+
+            var mcLines = [
+                ['Scenario prudent (P10)', formatCurrency(mcResults.finalP10)],
+                ['Scenario median (P50)', formatCurrency(mcResults.finalP50)],
+                ['Scenario favorable (P90)', formatCurrency(mcResults.finalP90)],
+                ['Probabilite de perte', Math.round(mcResults.probLoss * 100) + '%']
+            ];
+
+            doc.setFontSize(10);
+            mcLines.forEach(function(row) {
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(90, 125, 149);
+                doc.text(row[0] + ' :', margin, y);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(10, 37, 64);
+                doc.text(row[1], margin + 55, y);
+                y += 6;
+            });
+            y += 6;
+        }
+
         // ── Section: Chart Image ──
         try {
             var svgEl = els.chartSvg;
             if (svgEl) {
                 var svgData = new XMLSerializer().serializeToString(svgEl);
-                // Create a canvas to render SVG
                 var canvas = document.createElement('canvas');
                 canvas.width = 1200;
                 canvas.height = 480;
@@ -940,8 +1118,6 @@
                 var svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
                 var url = URL.createObjectURL(svgBlob);
 
-                // Use synchronous approach: draw chart placeholder text for now
-                // The async image load will be handled with a promise
                 var chartPromise = new Promise(function(resolve) {
                     img.onload = function() {
                         ctx.drawImage(img, 0, 0, 1200, 480);
@@ -958,6 +1134,11 @@
 
                 chartPromise.then(function(dataUrl) {
                     if (dataUrl) {
+                        // Check if we need a new page
+                        if (y > 180) {
+                            doc.addPage();
+                            y = 20;
+                        }
                         doc.setFontSize(13);
                         doc.setFont(undefined, 'bold');
                         doc.setTextColor(10, 37, 64);
@@ -968,9 +1149,9 @@
                         doc.addImage(dataUrl, 'PNG', margin, y, contentW, chartH);
                         y += chartH + 8;
 
-                        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName);
+                        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName, mcResults);
                     } else {
-                        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName);
+                        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName, mcResults);
                     }
                 });
                 return; // async path
@@ -979,10 +1160,106 @@
             // If SVG conversion fails, continue without chart
         }
 
-        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName);
+        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName, mcResults);
     }
 
-    function finalizePDF(doc, y, margin, pageW, contentW, result, cycle, profile, clientName) {
+    function finalizePDF(doc, y, margin, pageW, contentW, result, cycle, profile, clientName, mcResults) {
+        // ── Section: Year-by-Year Table ──
+        if (y > 200) {
+            doc.addPage();
+            y = 20;
+        }
+
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(10, 37, 64);
+        doc.text('Tableau annee par annee', margin, y);
+        y += 8;
+
+        // Table columns
+        var cols = ['Annee', 'Valeur debut', 'Contributions', 'Rendement est.', 'Valeur fin'];
+        var colWidths = [18, 35, 32, 30, 35];
+        var colX = [margin];
+        for (var c = 1; c < cols.length; c++) {
+            colX.push(colX[c - 1] + colWidths[c - 1]);
+        }
+
+        // Draw table header
+        doc.setFillColor(0, 119, 182);
+        doc.rect(margin, y - 4, contentW, 7, 'F');
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(255, 255, 255);
+        for (var h = 0; h < cols.length; h++) {
+            doc.text(cols[h], colX[h] + 2, y);
+        }
+        y += 6;
+
+        // Table rows
+        var annualContrib = state.contribution * 12;
+        var adjustedReturn = result.adjustedReturn;
+        var tableValue = state.amount;
+
+        for (var yr = 1; yr <= state.horizon; yr++) {
+            // Check if we need a new page
+            if (y > 260) {
+                doc.addPage();
+                y = 20;
+                // Redraw header
+                doc.setFillColor(0, 119, 182);
+                doc.rect(margin, y - 4, contentW, 7, 'F');
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(255, 255, 255);
+                for (var hh = 0; hh < cols.length; hh++) {
+                    doc.text(cols[hh], colX[hh] + 2, y);
+                }
+                y += 6;
+            }
+
+            var startVal = tableValue;
+            tableValue += annualContrib;
+            var noise = 1 + (Math.sin(yr * 1.7 + state.amount * 0.00001) * 0.02);
+            tableValue *= (1 + adjustedReturn * noise);
+            var yearGain = tableValue - startVal - annualContrib;
+
+            var displayStart = startVal;
+            var displayEnd = tableValue;
+            if (state.adjustInflation) {
+                displayStart = startVal / Math.pow(1 + INFLATION_RATE, yr - 1);
+                displayEnd = tableValue / Math.pow(1 + INFLATION_RATE, yr);
+            }
+
+            // Alternate row background
+            if (yr % 2 === 0) {
+                doc.setFillColor(245, 248, 252);
+                doc.rect(margin, y - 3.5, contentW, 5.5, 'F');
+            }
+
+            doc.setFontSize(7.5);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(44, 74, 94);
+
+            var rowData = [
+                'An ' + yr,
+                formatCurrencyShort(Math.round(displayStart)),
+                annualContrib > 0 ? formatCurrencyShort(annualContrib) : '-',
+                formatCurrencyShort(Math.round(yearGain)),
+                formatCurrencyShort(Math.round(displayEnd))
+            ];
+
+            for (var rc = 0; rc < rowData.length; rc++) {
+                doc.text(rowData[rc], colX[rc] + 2, y);
+            }
+            y += 5;
+        }
+
+        // Table bottom border
+        doc.setDrawColor(200, 210, 220);
+        doc.setLineWidth(0.3);
+        doc.line(margin, y, margin + contentW, y);
+        y += 8;
+
         // ── Section: AI Analysis ──
         if (y > 220) {
             doc.addPage();
@@ -1000,7 +1277,7 @@
         doc.setTextColor(44, 74, 94);
 
         // Get plain text from analysis
-        var analysisText = buildAnalysisText(result, cycle, profile);
+        var analysisText = buildAnalysisText(result, cycle, profile, mcResults);
         var plainText = analysisText.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
 
         var splitText = doc.splitTextToSize(plainText, contentW);
@@ -1022,7 +1299,7 @@
         doc.setFontSize(7.5);
         doc.setFont(undefined, 'italic');
         doc.setTextColor(160, 180, 196);
-        var disclaimer = 'Simulation a titre indicatif seulement. Les rendements passes ne garantissent pas les rendements futurs. Ce document ne constitue pas un conseil financier. Consultez un professionnel avant de prendre toute decision d\'investissement.';
+        var disclaimer = 'Simulation a titre indicatif seulement. Les rendements passes ne garantissent pas les rendements futurs. Les resultats Monte Carlo sont bases sur des simulations aleatoires et ne constituent pas une garantie. Ce document ne constitue pas un conseil financier. Consultez un professionnel avant de prendre toute decision d\'investissement.';
         var disclaimerLines = doc.splitTextToSize(disclaimer, contentW);
         doc.text(disclaimerLines, margin, y);
         y += disclaimerLines.length * 3.5 + 8;

@@ -2703,6 +2703,18 @@
                                 step="5000" value="100000">
                         </div>
 
+                        <!-- Monthly Contributions Slider -->
+                        <div class="compas-slider-group">
+                            <div class="slider-label">
+                                <span><i data-lucide="plus-circle" style="width:14px;height:14px;display:inline;"></i>
+                                    Contributions mensuelles
+                                    <span class="tooltip-trigger">?<span class="tooltip-bubble">Ajouter des versements mensuels réguliers accélère considérablement la croissance de votre portefeuille grâce à l'effet des intérêts composés.</span></span>
+                                </span>
+                                <span class="slider-value" id="compas-contribution-value">0 $ / mois</span>
+                            </div>
+                            <input type="range" class="compas-range" id="compas-contribution" min="0" max="5000" step="50" value="0">
+                        </div>
+
                         <!-- Horizon Slider -->
                         <div class="compas-slider-group">
                             <div class="slider-label">
@@ -2728,6 +2740,17 @@
                                 <span class="slider-value" id="compas-goal-value">Désactivé</span>
                             </div>
                             <input type="range" class="compas-range" id="compas-goal" min="0" max="3000000" step="25000" value="0">
+                        </div>
+
+                        <!-- Inflation Toggle -->
+                        <div class="compas-toggle-group">
+                            <label class="compas-toggle">
+                                <input type="checkbox" id="compas-inflation-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Ajuster pour l'inflation (2%/an)
+                                <span class="tooltip-trigger">?<span class="tooltip-bubble">Activé, cette option montre la valeur de votre portefeuille en dollars d'aujourd'hui, ajustée pour une inflation moyenne de 2% par année.</span></span>
+                            </span>
                         </div>
 
                         <!-- Risk Profile -->
@@ -2817,8 +2840,8 @@
                                 <div class="stat-label">Gain projeté</div>
                             </div>
                             <div class="compas-stat">
-                                <div class="stat-value" id="stat-return">7.5%</div>
-                                <div class="stat-label">Rendement annuel</div>
+                                <div class="stat-value" id="stat-return">6% — 8%</div>
+                                <div class="stat-label">Fourchette estimée</div>
                             </div>
                             <div class="compas-stat">
                                 <div class="stat-value" id="stat-alloc">65% Actions</div>
