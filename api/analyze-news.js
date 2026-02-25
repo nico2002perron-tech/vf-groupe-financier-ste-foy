@@ -1,42 +1,35 @@
 const https = require('https');
 
-// RSS feeds par secteur
-const RSS_FEEDS = {
-    all: [
-        'https://ici.radio-canada.ca/rss/4159',          // Radio-Canada Économie
-        'https://www.lesaffaires.com/rss',                // Les Affaires
-        'https://www.lapresse.ca/affaires/rss',           // La Presse Affaires
-    ],
-    tech: [
-        'https://ici.radio-canada.ca/rss/4169',          // Radio-Canada Science/Tech
-    ],
-    health: [
-        'https://ici.radio-canada.ca/rss/4159',
-    ],
-    crypto: [
-        'https://www.lesaffaires.com/rss',
-    ],
-    industrial: [
-        'https://www.lesaffaires.com/rss',
-    ],
-    energy: [
-        'https://www.lesaffaires.com/rss',
-    ],
-    finance: [
-        'https://www.lesaffaires.com/rss',
-        'https://www.lapresse.ca/affaires/rss',
-    ],
-    defensive: [
-        'https://ici.radio-canada.ca/rss/4159',
-    ]
+// ALL RSS feeds — on fetche tout pour avoir un gros bassin d'articles
+const ALL_FEEDS = [
+    'https://ici.radio-canada.ca/rss/4159',          // Radio-Canada Économie
+    'https://ici.radio-canada.ca/rss/4169',          // Radio-Canada Science/Tech
+    'https://www.lapresse.ca/affaires/rss',           // La Presse Affaires
+    'https://www.lesaffaires.com/rss',                // Les Affaires
+];
+
+// Secteurs valides (correspondent aux onglets du frontend)
+const VALID_SECTORS = ['all', 'health', 'tech', 'crypto', 'industrial', 'energy', 'finance', 'defensive'];
+
+const SECTOR_LABELS = {
+    all: 'tous les secteurs',
+    health: 'santé',
+    tech: 'technologie',
+    crypto: 'cryptomonnaies',
+    industrial: 'industriel',
+    energy: 'énergie',
+    finance: 'finance',
+    defensive: 'défensif'
 };
 
-// Fetch URL content via https
+// Max age = 2 jours (en ms)
+const MAX_AGE_MS = 2 * 24 * 60 * 60 * 1000;
+
+// ── Fetch URL ──
 function fetchURL(url) {
     return new Promise((resolve, reject) => {
         const client = url.startsWith('https') ? https : require('http');
         const req = client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 GFSF-Radar/1.0' } }, (res) => {
-            // Handle redirects
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 return fetchURL(res.headers.location).then(resolve).catch(reject);
             }
@@ -45,36 +38,37 @@ function fetchURL(url) {
             res.on('end', () => resolve(data));
         });
         req.on('error', reject);
-        req.setTimeout(8000, () => { req.destroy(); reject(new Error('Timeout')); });
+        req.setTimeout(10000, () => { req.destroy(); reject(new Error('Timeout')); });
     });
 }
 
-// Parse RSS XML simply (no dependency needed)
+// ── Parse RSS XML (no dependencies) ──
 function parseRSS(xml) {
     const articles = [];
     const items = xml.split('<item>').slice(1);
 
-    for (const item of items.slice(0, 10)) {
-        const title = (item.match(/<title><!\[CDATA\[(.*?)\]\]>|<title>(.*?)<\/title>/) || [])[1] ||
-                      (item.match(/<title>(.*?)<\/title>/) || [])[1] || '';
+    for (const item of items.slice(0, 20)) {
+        const title = (item.match(/<title><!\[CDATA\[(.*?)\]\]>/s) || [])[1] ||
+                      (item.match(/<title>(.*?)<\/title>/s) || [])[1] || '';
         const link = (item.match(/<link>(.*?)<\/link>/) || [])[1] || '';
         const pubDate = (item.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || '';
-        const desc = (item.match(/<description><!\[CDATA\[(.*?)\]\]>|<description>(.*?)<\/description>/) || [])[1] ||
-                     (item.match(/<description>(.*?)<\/description>/) || [])[1] || '';
+        const desc = (item.match(/<description><!\[CDATA\[(.*?)\]\]>/s) || [])[1] ||
+                     (item.match(/<description>(.*?)<\/description>/s) || [])[1] || '';
 
-        if (title && title.length > 10) {
+        const cleanTitle = title.replace(/<[^>]+>/g, '').trim();
+        if (cleanTitle && cleanTitle.length > 10) {
             articles.push({
-                title: title.replace(/<[^>]+>/g, '').trim(),
+                title: cleanTitle,
                 link: link.trim(),
                 pubDate: pubDate.trim(),
-                description: desc.replace(/<[^>]+>/g, '').substring(0, 300).trim()
+                description: desc.replace(/<[^>]+>/g, '').substring(0, 400).trim()
             });
         }
     }
     return articles;
 }
 
-// Get time ago string
+// ── Helpers ──
 function getTimeAgo(pubDate) {
     if (!pubDate) return '??';
     try {
@@ -83,12 +77,9 @@ function getTimeAgo(pubDate) {
         if (diffMins < 60) return `${diffMins}min`;
         if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h`;
         return `${Math.floor(diffMins / 1440)}j`;
-    } catch {
-        return '??';
-    }
+    } catch { return '??'; }
 }
 
-// Detect source name from URL
 function getSourceName(link) {
     if (!link) return 'Actualités';
     if (link.includes('radio-canada')) return 'Radio-Canada';
@@ -98,44 +89,53 @@ function getSourceName(link) {
     return 'Actualités';
 }
 
-// Call Groq API to analyze articles
-async function analyzeWithGroq(articles, sector) {
+function isWithin2Days(pubDate) {
+    if (!pubDate) return true; // keep if no date
+    try {
+        return (Date.now() - new Date(pubDate).getTime()) <= MAX_AGE_MS;
+    } catch { return true; }
+}
+
+// ── Groq API : Classify + Summarize ──
+async function classifyAndSummarize(articles) {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
         console.error('GROQ_API_KEY not set');
         return null;
     }
 
-    const sectorNames = {
-        all: 'tous les secteurs financiers',
-        health: 'le secteur de la santé',
-        tech: 'le secteur technologique',
-        crypto: 'les cryptomonnaies',
-        industrial: 'le secteur industriel',
-        energy: 'le secteur de l\'énergie',
-        finance: 'le secteur financier',
-        defensive: 'les secteurs défensifs'
-    };
-
-    const articlesList = articles.slice(0, 8).map((a, i) =>
-        `${i + 1}. "${a.title}" — ${a.description || 'Pas de description'}`
+    const articlesList = articles.map((a, i) =>
+        `${i + 1}. "${a.title}" — ${a.description || ''}`
     ).join('\n');
 
-    const prompt = `Tu es un analyste financier expert. Analyse ces actualités pour ${sectorNames[sector] || 'les marchés'}.
+    const prompt = `Tu es un analyste financier expert québécois.
 
-Pour chaque article, donne un résumé de 1-2 phrases en français qui explique l'impact potentiel sur les investisseurs québécois.
+TÂCHE : Pour chaque article ci-dessous, tu dois :
+1. Le CLASSER dans UN secteur parmi : health, tech, crypto, industrial, energy, finance, defensive
+2. Écrire un RÉSUMÉ analytique de 1-2 phrases en français (impact pour investisseurs québécois)
+
+RÈGLES DE CLASSIFICATION :
+- "health" : pharmaceutique, hôpitaux, biotechnologie, soins de santé, médicaments, CHSLD, système de santé
+- "tech" : technologie, IA, logiciels, semi-conducteurs, télécommunications, startups tech, données, cybersécurité
+- "crypto" : bitcoin, ethereum, blockchain, cryptomonnaies, Web3, NFT, DeFi
+- "industrial" : manufacturier, construction, transport, infrastructure, aérospatiale, mines, automobile
+- "energy" : pétrole, gaz, hydro-électricité, énergie renouvelable, solaire, éolien, nucléaire
+- "finance" : banques, assurances, marchés boursiers, taux d'intérêt, Banque du Canada, REER, CELI, fonds, investissement, rendement, bénéfice
+- "defensive" : alimentation, services publics, immobilier, consommation de base, télécoms traditionnelles, détaillants essentiels
+
+Si un article touche plusieurs secteurs, choisis le PLUS pertinent.
 
 Articles :
 ${articlesList}
 
-Réponds UNIQUEMENT en JSON valide, un tableau d'objets avec les champs "index" (numéro de l'article) et "summary" (ton analyse en français).
-Exemple : [{"index":1,"summary":"Résumé ici..."}]`;
+Réponds UNIQUEMENT en JSON valide : un tableau d'objets avec "index" (numéro), "sector" (un des 7 secteurs), "summary" (analyse en français).
+Exemple : [{"index":1,"sector":"finance","summary":"..."}]`;
 
     const body = JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 1500
+        temperature: 0.2,
+        max_tokens: 3000
     });
 
     const data = await new Promise((resolve, reject) => {
@@ -152,15 +152,12 @@ Exemple : [{"index":1,"summary":"Résumé ici..."}]`;
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
-                try {
-                    resolve(JSON.parse(data));
-                } catch {
-                    reject(new Error('Invalid Groq response'));
-                }
+                try { resolve(JSON.parse(data)); }
+                catch { reject(new Error('Invalid Groq response')); }
             });
         });
         req.on('error', reject);
-        req.setTimeout(15000, () => { req.destroy(); reject(new Error('Groq timeout')); });
+        req.setTimeout(25000, () => { req.destroy(); reject(new Error('Groq timeout')); });
         req.write(body);
         req.end();
     });
@@ -172,7 +169,6 @@ Exemple : [{"index":1,"summary":"Résumé ici..."}]`;
 
     const content = data.choices?.[0]?.message?.content || '';
     try {
-        // Extract JSON from response (might be wrapped in markdown)
         const jsonMatch = content.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
             return JSON.parse(jsonMatch[0]);
@@ -183,43 +179,38 @@ Exemple : [{"index":1,"summary":"Résumé ici..."}]`;
     return null;
 }
 
+// ── Main Handler ──
 module.exports = async function handler(req, res) {
-    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     const sector = req.body?.sector || 'all';
-    const feeds = RSS_FEEDS[sector] || RSS_FEEDS.all;
 
     try {
-        // 1. Fetch all RSS feeds in parallel
-        const feedPromises = feeds.map(url =>
-            fetchURL(url).catch(err => {
-                console.error(`RSS fetch failed for ${url}:`, err.message);
-                return '';
-            })
+        // 1. Fetch TOUS les feeds RSS en parallèle
+        const feedResults = await Promise.all(
+            ALL_FEEDS.map(url =>
+                fetchURL(url).catch(err => {
+                    console.error(`RSS failed: ${url}`, err.message);
+                    return '';
+                })
+            )
         );
-        const feedResults = await Promise.all(feedPromises);
 
-        // 2. Parse articles
+        // 2. Parser tous les articles
         let allArticles = [];
         feedResults.forEach(xml => {
-            if (xml) {
-                allArticles = allArticles.concat(parseRSS(xml));
-            }
+            if (xml) allArticles = allArticles.concat(parseRSS(xml));
         });
 
-        // Sort by date (newest first) and dedupe by title
+        // 3. Filtrer : max 2 jours, dédupliquer, trier par date
+        allArticles = allArticles.filter(a => isWithin2Days(a.pubDate));
         allArticles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
         const seen = new Set();
         allArticles = allArticles.filter(a => {
             const key = a.title.toLowerCase().substring(0, 50);
@@ -228,48 +219,112 @@ module.exports = async function handler(req, res) {
             return true;
         });
 
-        const topArticles = allArticles.slice(0, 8);
+        // Garder un bon bassin (max 25 articles à classifier)
+        allArticles = allArticles.slice(0, 25);
 
-        if (topArticles.length === 0) {
+        if (allArticles.length === 0) {
             return res.status(200).json({
                 success: false,
                 articles: [],
-                debug: { articlesReceived: 0, aiCalled: false, groqKey: '***configured***' }
+                debug: { articlesReceived: 0, aiCalled: false, groqKey: process.env.GROQ_API_KEY ? '***set***' : 'MISSING' }
             });
         }
 
-        // 3. Analyze with Groq AI
-        const analyses = await analyzeWithGroq(topArticles, sector);
+        // 4. Envoyer à Groq pour classification + résumé
+        const aiResults = await classifyAndSummarize(allArticles);
 
-        // 4. Build response
-        const articles = topArticles.map((article, i) => {
-            const aiSummary = analyses?.find(a => a.index === i + 1);
-            return {
-                title: article.title,
-                summary: aiSummary?.summary || article.description || 'Analyse en cours...',
-                source: getSourceName(article.link),
-                time: getTimeAgo(article.pubDate),
-                link: article.link,
-                isNew: getTimeAgo(article.pubDate).includes('min') ||
-                       (getTimeAgo(article.pubDate).includes('h') && parseInt(getTimeAgo(article.pubDate)) < 3)
-            };
+        // 5. Construire le map classifié
+        const classified = {}; // { sector: [ {article, summary} ] }
+        VALID_SECTORS.forEach(s => { if (s !== 'all') classified[s] = []; });
+
+        if (aiResults) {
+            aiResults.forEach(result => {
+                const idx = result.index - 1;
+                const article = allArticles[idx];
+                if (!article) return;
+
+                const sec = VALID_SECTORS.includes(result.sector) && result.sector !== 'all'
+                    ? result.sector : 'finance'; // fallback
+
+                classified[sec].push({
+                    title: article.title,
+                    summary: result.summary || article.description || 'Analyse en cours...',
+                    source: getSourceName(article.link),
+                    time: getTimeAgo(article.pubDate),
+                    link: article.link,
+                    sector: sec,
+                    isNew: getTimeAgo(article.pubDate).includes('min') ||
+                           (getTimeAgo(article.pubDate).includes('h') && parseInt(getTimeAgo(article.pubDate)) < 3)
+                });
+            });
+        } else {
+            // Fallback si Groq échoue : mettre tous dans finance
+            allArticles.slice(0, 8).forEach(article => {
+                classified['finance'].push({
+                    title: article.title,
+                    summary: article.description || 'Analyse indisponible.',
+                    source: getSourceName(article.link),
+                    time: getTimeAgo(article.pubDate),
+                    link: article.link,
+                    sector: 'finance',
+                    isNew: false
+                });
+            });
+        }
+
+        // 6. Garantir minimum 3 articles par secteur
+        //    Si un secteur en a moins de 3, on prend des articles des plus gros secteurs
+        const allClassified = [];
+        Object.values(classified).forEach(arr => allClassified.push(...arr));
+        allClassified.sort((a, b) => {
+            const ta = a.time, tb = b.time;
+            return 0; // keep original order
         });
+
+        for (const sec of Object.keys(classified)) {
+            while (classified[sec].length < 3 && allClassified.length > 0) {
+                // Trouver un article d'un secteur qui en a > 3, ou réutiliser le plus récent
+                let donor = null;
+                for (const otherSec of Object.keys(classified)) {
+                    if (otherSec !== sec && classified[otherSec].length > 3) {
+                        donor = classified[otherSec].pop();
+                        break;
+                    }
+                }
+                if (!donor) {
+                    // Dupliquer depuis le pool global (les plus récents)
+                    donor = { ...allClassified[classified[sec].length % allClassified.length] };
+                }
+                donor = { ...donor, sector: sec };
+                classified[sec].push(donor);
+            }
+        }
+
+        // 7. Retourner selon le secteur demandé
+        let responseArticles;
+        if (sector === 'all') {
+            // Pour "all" : prendre les plus récents de tous les secteurs, max 8
+            responseArticles = allClassified.slice(0, 8);
+        } else {
+            responseArticles = classified[sector] || [];
+        }
+
+        // Toujours au moins 3
+        responseArticles = responseArticles.slice(0, 8);
 
         return res.status(200).json({
             success: true,
-            articles,
+            articles: responseArticles,
             debug: {
-                groqKey: process.env.GROQ_API_KEY ? '***configured***' : 'MISSING',
-                articlesReceived: topArticles.length,
-                aiCalled: !!analyses
+                groqKey: process.env.GROQ_API_KEY ? '***set***' : 'MISSING',
+                articlesReceived: allArticles.length,
+                aiCalled: !!aiResults,
+                sectorsCount: Object.fromEntries(Object.entries(classified).map(([k, v]) => [k, v.length]))
             }
         });
 
     } catch (error) {
         console.error('Handler error:', error);
-        return res.status(500).json({
-            error: 'Internal server error',
-            message: error.message
-        });
+        return res.status(500).json({ error: 'Internal server error', message: error.message });
     }
 };
