@@ -6,7 +6,7 @@
 /* ── Section ── */
 .marches-v2 {
     position: relative;
-    background: linear-gradient(180deg, #f0f7fc 0%, #e6f0fa 40%, #f0f7fc 100%);
+    background: transparent;
     overflow: hidden;
 }
 

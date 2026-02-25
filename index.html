@@ -48,23 +48,9 @@
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--text);
-            background: linear-gradient(180deg,
-                    #ffffff 0%,
-                    #f3f6fa 8%,
-                    #e8f1f8 16%,
-                    #daeef8 24%,
-                    #e4f0f9 32%,
-                    #eef5fb 40%,
-                    #f0f5fa 48%,
-                    #e8f1f8 56%,
-                    #dce9f3 64%,
-                    #e8f1f8 72%,
-                    #f0f5fa 80%,
-                    #f3f6fa 90%,
-                    #ffffff 100%);
-            background-attachment: fixed;
+            background: #ffffff;
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden
+            overflow-x: hidden;
         }
 
         h1,
@@ -1667,23 +1653,23 @@
         }
 
         /* === IMMERSIVE SCROLL OVERRIDES === */
-        /* Make ALL sections transparent so body gradient shows through */
+        /* Make ALL sections transparent so body gradient shows through seamlessly */
         .gradient-section,
         .gradient-section.gradient-white-to-light,
         .gradient-section.gradient-light-to-cyan,
         .gradient-section.gradient-cyan-to-light,
         .gradient-section.gradient-light-to-white,
         .gradient-section.gradient-light,
-        .gradient-section.gradient-dark {
+        .gradient-section.gradient-dark,
+        .mission,
+        .services,
+        .compas-section,
+        .post-compas-cta,
+        .marches-v2,
+        .ai-radar-section-v2,
+        .team-carousel-section,
+        .bg-white {
             background: transparent !important;
-        }
-
-        /* Old chameleon-divider style override */
-        .chameleon-divider {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            opacity: .5;
         }
 
         /* Floating ambient layer that crosses section boundaries */
@@ -1699,14 +1685,14 @@
             position: absolute;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: .35;
+            opacity: 1;
             will-change: transform;
         }
 
         .ambient-layer .a-blob.ab1 {
             width: 500px;
             height: 500px;
-            background: rgba(0, 180, 216, .08);
+            background: rgba(0, 180, 216, .06);
             top: 10%;
             left: -5%;
             animation: abFloat1 30s ease-in-out infinite;
@@ -1715,7 +1701,7 @@
         .ambient-layer .a-blob.ab2 {
             width: 400px;
             height: 400px;
-            background: rgba(0, 119, 182, .06);
+            background: rgba(0, 119, 182, .05);
             top: 35%;
             right: -8%;
             animation: abFloat2 35s ease-in-out infinite -8s;
@@ -1724,7 +1710,7 @@
         .ambient-layer .a-blob.ab3 {
             width: 600px;
             height: 600px;
-            background: rgba(0, 180, 216, .05);
+            background: rgba(0, 180, 216, .04);
             top: 55%;
             left: 20%;
             animation: abFloat3 40s ease-in-out infinite -15s;
@@ -1733,7 +1719,7 @@
         .ambient-layer .a-blob.ab4 {
             width: 350px;
             height: 350px;
-            background: rgba(144, 224, 239, .07);
+            background: rgba(144, 224, 239, .06);
             top: 75%;
             right: 10%;
             animation: abFloat1 28s ease-in-out infinite -5s;
@@ -1796,18 +1782,28 @@
             }
         }
 
+        /* Reduce blobs on mobile for performance */
+        @media (max-width: 768px) {
+            .ambient-layer .a-blob {
+                filter: blur(80px);
+            }
+
+            .ambient-layer .a-blob.ab3,
+            .ambient-layer .a-blob.ab5 {
+                display: none;
+            }
+        }
+
         /* Ensure all sections sit above ambient layer */
         section,
         header,
-        .cham,
-        .chameleon-divider,
         .floating-cta,
         footer {
             position: relative;
             z-index: 1;
         }
 
-        /* Subtle grid overlay for depth (like Kraken) */
+        /* Subtle grid overlay for depth */
         body::before {
             content: '';
             position: fixed;
@@ -1815,41 +1811,70 @@
             pointer-events: none;
             z-index: 0;
             background-image:
-                linear-gradient(rgba(0, 180, 216, .012) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 180, 216, .012) 1px, transparent 1px);
+                linear-gradient(rgba(0, 180, 216, .02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 180, 216, .02) 1px, transparent 1px);
             background-size: 80px 80px;
         }
 
-        /* Soft section connectors — subtle glow between sections */
-        section::after {
-            content: '';
-            position: absolute;
-            bottom: -30px;
-            left: 10%;
-            right: 10%;
-            height: 60px;
-            background: radial-gradient(ellipse at center, rgba(0, 180, 216, .04) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* === FLOATING WHITE CARD CONTAINERS === */
-        /* All section containers become white floating cards */
-        .section-padding>.container,
-        .section-padding>div[style*="position: relative"] {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
+        /* === FLOATING 3D CARD CONTAINERS === */
+        /* Shared elevated card style — looks like it pops out of the screen */
+        .floating-card {
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, .7);
             box-shadow:
-                0 4px 32px rgba(0, 119, 182, .06),
-                0 1px 4px rgba(0, 0, 0, .04),
-                inset 0 0 0 1px rgba(255, 255, 255, .5);
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 8px 20px rgba(0, 60, 120, .05),
+                0 20px 50px rgba(0, 80, 160, .08),
+                0 40px 80px rgba(0, 40, 100, .06);
             padding: 48px 40px;
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
             z-index: 2;
+            transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s cubic-bezier(.16,1,.3,1);
+        }
+
+        .floating-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 12px 28px rgba(0, 60, 120, .07),
+                0 28px 60px rgba(0, 80, 160, .10),
+                0 50px 100px rgba(0, 40, 100, .07);
+        }
+
+        /* Apply to all section containers */
+        .section-padding>.container,
+        .section-padding>div[style*="position: relative"] {
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            box-shadow:
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 8px 20px rgba(0, 60, 120, .05),
+                0 20px 50px rgba(0, 80, 160, .08),
+                0 40px 80px rgba(0, 40, 100, .06);
+            padding: 48px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s cubic-bezier(.16,1,.3,1);
+        }
+
+        .section-padding>.container:hover,
+        .section-padding>div[style*="position: relative"]:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 12px 28px rgba(0, 60, 120, .07),
+                0 28px 60px rgba(0, 80, 160, .10),
+                0 50px 100px rgba(0, 40, 100, .07);
         }
 
         /* Mission section card */
@@ -1863,17 +1888,29 @@
         }
 
         .mission .m-wrap {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, .7);
             box-shadow:
-                0 4px 32px rgba(0, 119, 182, .06),
-                0 1px 4px rgba(0, 0, 0, .04),
-                inset 0 0 0 1px rgba(255, 255, 255, .5);
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 8px 20px rgba(0, 60, 120, .05),
+                0 20px 50px rgba(0, 80, 160, .08),
+                0 40px 80px rgba(0, 40, 100, .06);
             padding: 48px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s cubic-bezier(.16,1,.3,1);
+        }
+
+        .mission .m-wrap:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 12px 28px rgba(0, 60, 120, .07),
+                0 28px 60px rgba(0, 80, 160, .10),
+                0 50px 100px rgba(0, 40, 100, .07);
         }
 
         /* Services section card */
@@ -1882,35 +1919,60 @@
         }
 
         .services .sv-wrap {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, .7);
             box-shadow:
-                0 4px 32px rgba(0, 119, 182, .06),
-                0 1px 4px rgba(0, 0, 0, .04),
-                inset 0 0 0 1px rgba(255, 255, 255, .5);
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 8px 20px rgba(0, 60, 120, .05),
+                0 20px 50px rgba(0, 80, 160, .08),
+                0 40px 80px rgba(0, 40, 100, .06);
             padding: 48px 32px;
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
             z-index: 2;
+            transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s cubic-bezier(.16,1,.3,1);
+        }
+
+        .services .sv-wrap:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 12px 28px rgba(0, 60, 120, .07),
+                0 28px 60px rgba(0, 80, 160, .10),
+                0 50px 100px rgba(0, 40, 100, .07);
         }
 
         /* Contact form section card */
         .contact-form-section .container,
         .contact-form-section>.container {
-            background: rgba(255, 255, 255, .88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, .7);
             box-shadow:
-                0 4px 32px rgba(0, 119, 182, .06),
-                0 1px 4px rgba(0, 0, 0, .04),
-                inset 0 0 0 1px rgba(255, 255, 255, .5);
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 8px 20px rgba(0, 60, 120, .05),
+                0 20px 50px rgba(0, 80, 160, .08),
+                0 40px 80px rgba(0, 40, 100, .06);
             padding: 48px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s cubic-bezier(.16,1,.3,1);
+        }
+
+        .contact-form-section .container:hover,
+        .contact-form-section>.container:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 2px 4px rgba(0, 60, 120, .03),
+                0 12px 28px rgba(0, 60, 120, .07),
+                0 28px 60px rgba(0, 80, 160, .10),
+                0 50px 100px rgba(0, 40, 100, .07);
         }
 
         /* Responsive card adjustments */
@@ -1921,9 +1983,18 @@
             .mission .m-wrap,
             .services .sv-wrap,
             .contact-form-section .container {
-                border-radius: 16px;
+                border-radius: 20px;
                 padding: 32px 20px;
                 margin: 0 12px;
+            }
+
+            /* Disable hover lift on mobile (touch devices) */
+            .section-padding>.container:hover,
+            .section-padding>div[style*="position: relative"]:hover,
+            .mission .m-wrap:hover,
+            .services .sv-wrap:hover,
+            .contact-form-section .container:hover {
+                transform: none;
             }
         }
 
@@ -2877,55 +2948,6 @@
         </div>
     </div>
 
-    <!-- Vapor Fog Divider -->
-    <div class="chameleon-divider" onclick="document.getElementById('marches').scrollIntoView({behavior: 'smooth'})">
-        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
-            <defs>
-                <linearGradient id="vapor-gradient-3" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#0077b6">
-                        <animate attributeName="stop-color" values="#0077b6;#b8d4e8;#5fa8d3;#0077b6" dur="20s"
-                            repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="50%" style="stop-color:#b8d4e8">
-                        <animate attributeName="stop-color" values="#b8d4e8;#5fa8d3;#0077b6;#b8d4e8" dur="20s"
-                            repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="100%" style="stop-color:#5fa8d3">
-                        <animate attributeName="stop-color" values="#5fa8d3;#0077b6;#b8d4e8;#5fa8d3" dur="20s"
-                            repeatCount="indefinite" />
-                    </stop>
-                </linearGradient>
-            </defs>
-            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-3)"
-                fill="none" stroke-width="8" />
-            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-3)"
-                fill="none" stroke-width="6" />
-            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-3)"
-                fill="none" stroke-width="4" />
-        </svg>
-        <div class="particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <!-- Left side particles -->
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <!-- Right side particles -->
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-        </div>
-        <div class="scroll-indicator">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
-        </div>
-    </div>
-
     <!-- Live Markets Section -->
     <!-- Live Markets Section (Header Only) -->
     <!-- ============ MARCHÉS EN TEMPS RÉEL V2 — ÉDUCATIF ============ -->
@@ -3352,55 +3374,6 @@
 
 
 
-    <!-- Vapor Fog Divider -->
-    <div class="chameleon-divider" onclick="document.getElementById('equipe').scrollIntoView({behavior: 'smooth'})">
-        <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
-            <defs>
-                <linearGradient id="vapor-gradient-4" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#b8d4e8">
-                        <animate attributeName="stop-color" values="#b8d4e8;#0077b6;#5fa8d3;#b8d4e8" dur="22s"
-                            repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="50%" style="stop-color:#0077b6">
-                        <animate attributeName="stop-color" values="#0077b6;#5fa8d3;#b8d4e8;#0077b6" dur="22s"
-                            repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="100%" style="stop-color:#5fa8d3">
-                        <animate attributeName="stop-color" values="#5fa8d3;#b8d4e8;#0077b6;#5fa8d3" dur="22s"
-                            repeatCount="indefinite" />
-                    </stop>
-                </linearGradient>
-            </defs>
-            <path class="chameleon-wave wave-1" d="M0,70 Q300,40 600,70 T1200,70" stroke="url(#vapor-gradient-4)"
-                fill="none" stroke-width="8" />
-            <path class="chameleon-wave wave-2" d="M0,80 Q400,110 800,80 T1200,80" stroke="url(#vapor-gradient-4)"
-                fill="none" stroke-width="6" />
-            <path class="chameleon-wave wave-3" d="M0,60 Q350,30 700,60 T1200,60" stroke="url(#vapor-gradient-4)"
-                fill="none" stroke-width="4" />
-        </svg>
-        <div class="particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <!-- Left side particles -->
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <div class="particle-left"></div>
-            <!-- Right side particles -->
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-            <div class="particle-right"></div>
-        </div>
-        <div class="scroll-indicator">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
-        </div>
-    </div>
-
     <!-- Team Section (Carousel Layout) -->
     <section id="equipe" class="section-padding gradient-section gradient-light-to-white team-carousel-section">
         <div class="container team-layout">
@@ -3706,6 +3679,7 @@
     </footer>
 
     <!-- JS -->
+    <script src="./js/scroll-bg.js"></script>
     <!-- Chart.js for Custom Live Markets -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./js/app.js"></script>

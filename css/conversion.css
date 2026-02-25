@@ -346,7 +346,7 @@
 
 .contact-form-section {
     position: relative;
-    background: linear-gradient(180deg, #f0f7fc 0%, #e6f0fa 100%);
+    background: transparent;
     overflow: hidden;
 }
 

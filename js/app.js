@@ -23,16 +23,25 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', closeMenu);
     });
 
-    // --- Scroll Animations (Intersection Observer) ---
+    // --- Scroll Animations (Intersection Observer) with Stagger ---
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px"
+        threshold: 0.15,
+        rootMargin: "0px 0px -60px 0px"
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
+
+                // Stagger children with .fade-child class
+                const children = entry.target.querySelectorAll('.fade-child');
+                children.forEach((child, i) => {
+                    child.style.setProperty('--stagger-delay', (i * 0.1).toString());
+                    // Trigger visibility after a micro-delay so CSS var is set
+                    requestAnimationFrame(() => child.classList.add('visible'));
+                });
+
                 observer.unobserve(entry.target);
             }
         });

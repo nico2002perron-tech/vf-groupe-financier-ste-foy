@@ -40,7 +40,7 @@ html {
 body {
     font-family: 'Open Sans', sans-serif;
     color: var(--text-main);
-    background-color: var(--bg-white);
+    background: #ffffff;
     line-height: 1.6;
     position: relative;
     overflow-x: hidden;
@@ -136,46 +136,14 @@ ul {
     text-align: center;
 }
 
+/* =========================================
+   SECTION SPACING (Clean, no overlap)
+   ========================================= */
 .section-padding {
     padding: 80px 0;
     position: relative;
-    border-radius: 40px 40px 0 0;
-    margin-top: -30px;
     z-index: 1;
-}
-
-/* First section after hero - no negative margin */
-.hero-section+.section-padding,
-#mission {
-    margin-top: 0;
-}
-
-/* Alternate sections get bottom rounded corners too */
-.section-padding:nth-of-type(even) {
-    border-radius: 40px;
-    margin-top: -30px;
-    margin-bottom: -30px;
-    z-index: 2;
-}
-
-/* Ensure proper stacking */
-.section-padding:nth-of-type(odd) {
-    z-index: 1;
-}
-
-/* Add subtle shadow for depth at overlaps */
-.section-padding::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(to bottom,
-            rgba(0, 0, 0, 0.05) 0%,
-            transparent 100%);
-    border-radius: 40px 40px 0 0;
-    pointer-events: none;
+    background: transparent;
 }
 
 .divider {
@@ -186,388 +154,14 @@ ul {
     border-radius: 2px;
 }
 
-/* =========================================
-   SECTION GRADIENT TRANSITIONS
-   ========================================= */
-
-/* Base gradient section - removes hard edges */
-.gradient-section {
-    border-radius: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-.gradient-section::before {
-    display: none;
-}
-
-/* Gradient: White to Light Grey - MORE VISIBLE */
-.gradient-white-to-light {
-    background: linear-gradient(180deg,
-            #ffffff 0%,
-            #f3f6fa 60%,
-            #e6f0fa 100%);
-}
-
-/* Gradient: Solid Light */
-.gradient-light {
-    background: linear-gradient(180deg,
-            var(--bg-light) 0%,
-            #ebf5fc 70%,
-            #dceafe 100%);
-}
-
-/* Gradient: Light to Cyan (blends into cycle section) */
-.gradient-light-to-cyan {
-    background: linear-gradient(180deg,
-            var(--bg-light) 0%,
-            #e0f2fe 50%,
-            #bae6fd 100%);
-}
-
-/* Gradient: Cyan/Blue to Light (coming from cycle section) */
-.gradient-cyan-to-light {
-    background: linear-gradient(180deg,
-            #bae6fd 0%,
-            #e0f2fe 40%,
-            var(--bg-light) 100%);
-}
-
-/* Gradient: Light to White (final section) */
+/* All gradient-section classes now transparent â€” body gradient shows through */
+.gradient-section,
+.gradient-white-to-light,
+.gradient-light,
+.gradient-light-to-cyan,
+.gradient-cyan-to-light,
 .gradient-light-to-white {
-    background: linear-gradient(180deg,
-            var(--bg-light) 0%,
-            #f1f5f9 50%,
-            #f8fafc 80%,
-            #ffffff 100%);
-}
-
-/* =========================================
-   INTERACTIVE VAPOR DIVIDERS (Enhanced)
-   ========================================= */
-
-.chameleon-divider {
-    position: relative;
-    width: 100%;
-    height: 80px;
-    overflow: hidden;
-    z-index: 50;
-    margin: -30px 0;
-    pointer-events: auto;
-    cursor: pointer;
-    background: transparent;
-    /* Ensure transparent background */
-}
-
-.chameleon-divider svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    filter: drop-shadow(0 0 5px rgba(0, 180, 216, 0.4));
-    /* Glow effect for visibility */
-    transition: filter 0.5s ease;
-}
-
-/* Hover effect - becomes clearer and more vibrant */
-.chameleon-divider:hover svg {
-    filter: drop-shadow(0 0 8px rgba(0, 180, 216, 0.8));
-}
-
-.chameleon-divider:hover .chameleon-wave {
-    stroke-width: 14 !important;
-    opacity: 1 !important;
-    filter: none !important;
-    /* Clearer on hover */
-}
-
-/* Vapor wave paths - more visible */
-.chameleon-wave {
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: stroke-width 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
-    opacity: 1 !important;
-    /* Force visibility */
-}
-
-.chameleon-wave.wave-1 {
-    animation: vaporFlow1 12s ease-in-out infinite;
-    opacity: 1;
-    stroke: #00b4d8;
-    /* Fallback color */
-}
-
-.chameleon-wave.wave-2 {
-    animation: vaporFlow2 15s ease-in-out infinite;
-    opacity: 0.8;
-}
-
-.chameleon-wave.wave-3 {
-    animation: vaporFlow3 18s ease-in-out infinite;
-    opacity: 0.6;
-}
-
-/* Slow vapor animation - gentle floating motion */
-@keyframes vaporFlow1 {
-
-    0%,
-    100% {
-        d: path("M0,70 Q300,40 600,70 T1200,70");
-        transform: translateY(0);
-    }
-
-    50% {
-        d: path("M0,70 Q300,100 600,70 T1200,70");
-        transform: translateY(-8px);
-    }
-}
-
-@keyframes vaporFlow2 {
-
-    0%,
-    100% {
-        d: path("M0,80 Q400,110 800,80 T1200,80");
-        transform: translateY(0) translateX(0);
-    }
-
-    33% {
-        d: path("M0,80 Q400,50 800,80 T1200,80");
-        transform: translateY(8px) translateX(15px);
-    }
-
-    66% {
-        d: path("M0,80 Q400,95 800,80 T1200,80");
-        transform: translateY(-5px) translateX(-8px);
-    }
-}
-
-@keyframes vaporFlow3 {
-
-    0%,
-    100% {
-        d: path("M0,60 Q350,30 700,60 T1200,60");
-        transform: translateY(0);
-    }
-
-    50% {
-        d: path("M0,60 Q350,90 700,60 T1200,60");
-        transform: translateY(10px);
-    }
-}
-
-/* Gradient fog layers - subtle & pale transition */
-.chameleon-divider::before,
-.chameleon-divider::after {
-    display: none;
-    /* Remove fog to make lines clearer */
-}
-
-
-/* Floating particles effect - center particles */
-.chameleon-divider .particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: visible;
-    pointer-events: none;
-}
-
-.chameleon-divider .particle {
-    position: absolute;
-    width: 5px;
-    /* Bigger particles */
-    height: 5px;
-    background: #00b4d8;
-    /* Solid neon color */
-    box-shadow: 0 0 5px #00b4d8;
-    border-radius: 50%;
-    animation: floatParticle 10s ease-in-out infinite;
-}
-
-/* Center particles */
-.chameleon-divider .particle:nth-child(1) {
-    left: 20%;
-    animation-delay: 0s;
-}
-
-.chameleon-divider .particle:nth-child(2) {
-    left: 35%;
-    animation-delay: -2s;
-}
-
-.chameleon-divider .particle:nth-child(3) {
-    left: 50%;
-    animation-delay: -4s;
-}
-
-.chameleon-divider .particle:nth-child(4) {
-    left: 65%;
-    animation-delay: -1s;
-}
-
-.chameleon-divider .particle:nth-child(5) {
-    left: 80%;
-    animation-delay: -3s;
-}
-
-.chameleon-divider .particle:nth-child(6) {
-    left: 90%;
-    animation-delay: -5s;
-}
-
-/* Side particles - Left side */
-.chameleon-divider .particle-left {
-    position: absolute;
-    left: 2%;
-    width: 5px;
-    height: 5px;
-    background: radial-gradient(circle, rgba(173, 216, 230, 0.6), transparent);
-    border-radius: 50%;
-    animation: floatSideParticle 12s ease-in-out infinite;
-}
-
-.chameleon-divider .particle-left:nth-child(7) {
-    top: 20%;
-    animation-delay: 0s;
-}
-
-.chameleon-divider .particle-left:nth-child(8) {
-    top: 50%;
-    animation-delay: -3s;
-    left: 4%;
-}
-
-.chameleon-divider .particle-left:nth-child(9) {
-    top: 80%;
-    animation-delay: -6s;
-    left: 1%;
-}
-
-/* Side particles - Right side */
-.chameleon-divider .particle-right {
-    position: absolute;
-    right: 2%;
-    width: 5px;
-    height: 5px;
-    background: radial-gradient(circle, rgba(173, 216, 230, 0.6), transparent);
-    border-radius: 50%;
-    animation: floatSideParticle 12s ease-in-out infinite reverse;
-}
-
-.chameleon-divider .particle-right:nth-child(10) {
-    top: 30%;
-    animation-delay: -2s;
-}
-
-.chameleon-divider .particle-right:nth-child(11) {
-    top: 60%;
-    animation-delay: -5s;
-    right: 5%;
-}
-
-.chameleon-divider .particle-right:nth-child(12) {
-    top: 90%;
-    animation-delay: -8s;
-    right: 3%;
-}
-
-@keyframes floatParticle {
-
-    0%,
-    100% {
-        transform: translateY(60px) scale(0);
-        opacity: 0;
-    }
-
-    15% {
-        opacity: 0.7;
-        transform: translateY(50px) scale(1);
-    }
-
-    50% {
-        transform: translateY(25px) scale(1.1);
-        opacity: 0.5;
-    }
-
-    85% {
-        opacity: 0.7;
-        transform: translateY(5px) scale(1);
-    }
-
-    100% {
-        transform: translateY(-10px) scale(0);
-        opacity: 0;
-    }
-}
-
-@keyframes floatSideParticle {
-
-    0%,
-    100% {
-        transform: translateY(0) translateX(0) scale(0.5);
-        opacity: 0.3;
-    }
-
-    25% {
-        transform: translateY(-20px) translateX(10px) scale(1);
-        opacity: 0.6;
-    }
-
-    50% {
-        transform: translateY(-40px) translateX(-5px) scale(0.8);
-        opacity: 0.5;
-    }
-
-    75% {
-        transform: translateY(-60px) translateX(15px) scale(1.1);
-        opacity: 0.7;
-    }
-
-    100% {
-        transform: translateY(-80px) translateX(0) scale(0.5);
-        opacity: 0.3;
-    }
-}
-
-/* Scroll indicator arrow bouncing */
-.chameleon-divider .scroll-indicator {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-}
-
-.chameleon-divider:hover .scroll-indicator {
-    opacity: 1;
-}
-
-.chameleon-divider .scroll-indicator svg {
-    width: 30px;
-    height: 30px;
-    filter: drop-shadow(0 0 10px rgba(0, 180, 216, 0.8));
-    animation: bounceDown 1.5s ease-in-out infinite;
-}
-
-.chameleon-divider .scroll-indicator path {
-    stroke: rgba(0, 180, 216, 0.9);
-    stroke-width: 2;
-    fill: none;
-}
-
-@keyframes bounceDown {
-
-    0%,
-    100% {
-        transform: translateY(-5px);
-    }
-
-    50% {
-        transform: translateY(5px);
-    }
+    background: transparent !important;
 }
 
 /* Standard Visible Buttons */
@@ -2012,10 +1606,10 @@ ul {
    FOOTER
    ========================================= */
 footer {
-    background-color: var(--bg-light);
+    background: transparent;
     color: var(--brand-dark);
     padding: 80px 0 30px;
-    border-top: 1px solid #e1e8ed;
+    border-top: none;
 }
 
 .footer-content {
@@ -2356,17 +1950,41 @@ footer {
 }
 
 /* =========================================
-   ANIMATIONS
+   ANIMATIONS â€” Scroll Reveal
    ========================================= */
 .fade-in {
     opacity: 0;
-    transform: translateY(30px);
-    transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translateY(30px) scale(0.98);
+    transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fade-in.visible {
     opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Stagger children: each .fade-child gets incremental delay */
+.fade-child {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--stagger-delay, 0) * 1s);
+}
+
+.fade-child.visible {
+    opacity: 1;
     transform: translateY(0);
+}
+
+.fade-in-scroll {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in-scroll.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .delay-1 {
@@ -3764,7 +3382,7 @@ footer {
    PREMIUM MISSION SECTION
    ========================================= */
 .mission-section {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    background: transparent;
     position: relative;
 }
 
@@ -3914,11 +3532,7 @@ footer {
    ANIMATED WAVE DIVIDERS
    ========================================= */
 .wave-divider {
-    position: relative;
-    width: 100%;
-    height: 80px;
-    overflow: hidden;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    display: none;
 }
 
 .wave-divider svg {
@@ -5416,7 +5030,7 @@ footer {
     }
 }
 /* =========================================
-   RADAR STRATÉGIQUE I.A. - VERSION AMÉLIORÉE
+   RADAR STRATï¿½GIQUE I.A. - VERSION AMï¿½LIORï¿½E
    ========================================= */
 
 .featured-radar-section {
@@ -5451,7 +5065,7 @@ footer {
     z-index: 0;
 }
 
-/* Header amélioré */
+/* Header amï¿½liorï¿½ */
 .radar-header-featured {
     display: flex;
     align-items: center;
@@ -5620,7 +5234,7 @@ footer {
     line-height: 1.4;
 }
 
-/* Résumé */
+/* Rï¿½sumï¿½ */
 .news-summary {
     font-size: 0.95rem;
     color: #64748b;
@@ -5654,7 +5268,7 @@ footer {
     height: 14px;
 }
 
-/* Variations boursières (comme l'image) */
+/* Variations boursiï¿½res (comme l'image) */
 .news-tickers {
     display: flex;
     gap: 12px;
@@ -5700,7 +5314,7 @@ footer {
     font-size: 0.75rem;
 }
 
-/* État de chargement */
+/* ï¿½tat de chargement */
 .news-loading {
     text-align: center;
     padding: 60px 20px;
@@ -5726,7 +5340,7 @@ footer {
     font-size: 0.95rem;
 }
 
-/* État vide */
+/* ï¿½tat vide */
 .news-empty {
     text-align: center;
     padding: 60px 20px;
@@ -5740,7 +5354,7 @@ footer {
     opacity: 0.5;
 }
 
-/* Dernière mise à jour */
+/* Derniï¿½re mise ï¿½ jour */
 .last-update {
     display: flex;
     align-items: center;
