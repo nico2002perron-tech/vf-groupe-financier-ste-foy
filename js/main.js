@@ -18,9 +18,9 @@ async function loadNewsGratuit(sector) {
                 <div class="pulse-ring"></div>
                 <div class="pulse-ring"></div>
                 <div class="pulse-ring"></div>
-                <i data-lucide="bot" style="width:28px; height:28px; color: #0077b6;"></i>
+                <i data-lucide="newspaper" style="width:28px; height:28px; color: #0077b6;"></i>
             </div>
-            <p>🤖 Analyse I.A. en cours pour <strong>${getSectorName(sector)}</strong>...</p>
+            <p>Chargement des actualites pour <strong>${getSectorName(sector)}</strong>...</p>
             <div class="loading-bar"><div class="loading-bar-inner"></div></div>
         </div>
     `;
