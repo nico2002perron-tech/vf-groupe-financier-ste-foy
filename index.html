@@ -2718,6 +2718,18 @@
                                 value="15">
                         </div>
 
+                        <!-- Financial Goal Slider -->
+                        <div class="compas-slider-group">
+                            <div class="slider-label">
+                                <span><i data-lucide="target" style="width:14px;height:14px;display:inline;"></i>
+                                    Objectif financier
+                                    <span class="tooltip-trigger">?<span class="tooltip-bubble">Définissez un objectif et voyez en combien d'années vous pourriez l'atteindre selon votre profil.</span></span>
+                                </span>
+                                <span class="slider-value" id="compas-goal-value">Désactivé</span>
+                            </div>
+                            <input type="range" class="compas-range" id="compas-goal" min="0" max="3000000" step="25000" value="0">
+                        </div>
+
                         <!-- Risk Profile -->
                         <div class="compas-profile-group">
                             <div class="slider-label">
@@ -2749,6 +2761,15 @@
                             <i data-lucide="calendar"></i>
                             Discuter avec un expert
                         </a>
+
+                        <!-- PDF Export -->
+                        <div class="compas-pdf-group">
+                            <input type="text" class="compas-name-input" id="compas-client-name" placeholder="Votre nom (optionnel)">
+                            <button class="compas-pdf-btn" id="compas-pdf-btn">
+                                <i data-lucide="download"></i>
+                                Télécharger mon résumé PDF
+                            </button>
+                        </div>
                     </div>
 
                     <!-- RIGHT: Results -->
@@ -2763,7 +2784,11 @@
                                 </div>
                             </div>
                             <div class="compas-chart-wrap">
-                                <svg id="compas-svg-chart" viewBox="0 0 600 180" preserveAspectRatio="none"></svg>
+                                <svg id="compas-svg-chart" viewBox="0 0 600 240" preserveAspectRatio="none"></svg>
+                            </div>
+                            <div class="goal-badge" id="goal-badge" style="display:none;">
+                                <i data-lucide="target"></i>
+                                <span id="goal-badge-text"></span>
                             </div>
                         </div>
 
@@ -3684,6 +3709,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./js/app.js"></script>
     <script src="./js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
     <script src="./js/compas.js"></script>
     <script src="./js/cycle-v4.js"></script>
     <script>

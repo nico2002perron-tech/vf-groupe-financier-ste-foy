@@ -1,7 +1,9 @@
 /* =========================================
-   COMPAS PATRIMONIAL I.A. — ENGINE V2
+   COMPAS PATRIMONIAL I.A. — ENGINE V3
    Calculator · AI Text · SVG Chart
    Questionnaire · Tooltips · Cycle-Linked
+   3 Scenarios · Probability Cone · Goal
+   PDF Export
    ========================================= */
 
 (function () {
@@ -58,6 +60,7 @@
             baseReturn: 0.045,
             emoji: '🛡️',
             adjective: 'conservatrice',
+            color: '#10b981',
             description: 'Vous privilégiez la sécurité et la stabilité. Votre portefeuille sera axé sur les obligations et les placements à faible volatilité.'
         },
         equilibre: {
@@ -65,6 +68,7 @@
             baseReturn: 0.065,
             emoji: '⚖️',
             adjective: 'équilibrée',
+            color: '#0077b6',
             description: 'Vous recherchez un juste milieu entre croissance et sécurité. Un mix diversifié d\'actions et d\'obligations est idéal pour vous.'
         },
         croissance: {
@@ -72,9 +76,13 @@
             baseReturn: 0.085,
             emoji: '🚀',
             adjective: 'dynamique',
+            color: '#f59e0b',
             description: 'Vous êtes à l\'aise avec la volatilité et visez la croissance à long terme. Les actions domineront votre portefeuille.'
         }
     };
+
+    // Profile draw order (bottom to top for visual layering)
+    const PROFILE_KEYS = ['prudent', 'equilibre', 'croissance'];
 
     // ── Questionnaire Data ──
     const QUIZ_QUESTIONS = [
@@ -132,7 +140,8 @@
         amount: 100000,
         horizon: 15,
         profile: 'equilibre',
-        cycle: 'expansion'
+        cycle: 'expansion',
+        goalAmount: null
     };
 
     let quizState = {
@@ -150,6 +159,10 @@
             amountValue: document.getElementById('compas-amount-value'),
             horizonSlider: document.getElementById('compas-horizon'),
             horizonValue: document.getElementById('compas-horizon-value'),
+            goalSlider: document.getElementById('compas-goal'),
+            goalValue: document.getElementById('compas-goal-value'),
+            goalBadge: document.getElementById('goal-badge'),
+            goalBadgeText: document.getElementById('goal-badge-text'),
             profileBtns: document.querySelectorAll('.profile-btn'),
             chartSvg: document.getElementById('compas-svg-chart'),
             bigNumber: document.getElementById('compas-big-number'),
@@ -161,6 +174,8 @@
             statGain: document.getElementById('stat-gain'),
             statReturn: document.getElementById('stat-return'),
             statAlloc: document.getElementById('stat-alloc'),
+            pdfBtn: document.getElementById('compas-pdf-btn'),
+            clientName: document.getElementById('compas-client-name'),
             // V2
             discoverBtn: document.getElementById('compas-discover-btn'),
             quizOverlay: document.getElementById('quiz-overlay'),
@@ -183,6 +198,9 @@
         // Event listeners
         els.amountSlider.addEventListener('input', onAmountChange);
         els.horizonSlider.addEventListener('input', onHorizonChange);
+        if (els.goalSlider) {
+            els.goalSlider.addEventListener('input', onGoalChange);
+        }
         els.profileBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 els.profileBtns.forEach(b => b.classList.remove('active'));
@@ -230,6 +248,11 @@
             opt.addEventListener('click', onQuizOptionClick);
         });
 
+        // V3: PDF button
+        if (els.pdfBtn) {
+            els.pdfBtn.addEventListener('click', generatePDF);
+        }
+
         update();
     }
 
@@ -272,14 +295,27 @@
         update();
     }
 
+    function onGoalChange(e) {
+        const val = parseInt(e.target.value);
+        if (val === 0) {
+            state.goalAmount = null;
+            if (els.goalValue) els.goalValue.textContent = 'Désactivé';
+        } else {
+            state.goalAmount = val;
+            if (els.goalValue) els.goalValue.textContent = formatCurrency(val);
+        }
+        updateSliderFill(e.target);
+        update();
+    }
+
     function updateSliderFill(slider) {
         const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
         slider.style.background = `linear-gradient(90deg, #0077b6 ${pct}%, #e2ecf2 ${pct}%)`;
     }
 
     // ── Calculator ──
-    function calculate() {
-        const profile = PROFILES[state.profile];
+    function calculateForProfile(profileKey) {
+        const profile = PROFILES[profileKey];
         const cycle = CYCLE_DATA[state.cycle];
         const adjustedReturn = profile.baseReturn * cycle.returnModifier;
 
@@ -298,51 +334,164 @@
         return { points, finalValue, totalGain, annualReturn, adjustedReturn };
     }
 
+    function calculateAllProfiles() {
+        const results = {};
+        PROFILE_KEYS.forEach(key => {
+            results[key] = calculateForProfile(key);
+        });
+        return results;
+    }
+
+    function calculateCone(adjustedReturn, horizon, amount) {
+        const optimistReturn = Math.min(adjustedReturn + 0.03, adjustedReturn * 1.8);
+        const pessimistReturn = Math.max(adjustedReturn - 0.03, 0.005);
+
+        const optimiste = [];
+        const moyen = [];
+        const pessimiste = [];
+
+        let valOpt = amount, valMoy = amount, valPes = amount;
+        for (let year = 0; year <= horizon; year++) {
+            optimiste.push({ year, value: Math.round(valOpt) });
+            moyen.push({ year, value: Math.round(valMoy) });
+            pessimiste.push({ year, value: Math.round(valPes) });
+
+            const noise = 1 + (Math.sin(year * 1.7 + amount * 0.00001) * 0.02);
+            valOpt *= (1 + optimistReturn * noise);
+            valMoy *= (1 + adjustedReturn * noise);
+            valPes *= (1 + pessimistReturn * noise);
+        }
+
+        return { optimiste, moyen, pessimiste };
+    }
+
+    function calculateGoalYear(points, goalAmount) {
+        for (let i = 0; i < points.length; i++) {
+            if (points[i].value >= goalAmount) {
+                return { year: points[i].year, index: i, achieved: true };
+            }
+        }
+        return { year: null, index: null, achieved: false };
+    }
+
     // ── Update All ──
     function update() {
-        const result = calculate();
+        const allResults = calculateAllProfiles();
+        const activeResult = allResults[state.profile];
         const cycle = CYCLE_DATA[state.cycle];
         const profile = PROFILES[state.profile];
 
-        if (els.bigNumber) els.bigNumber.textContent = formatCurrency(result.finalValue);
+        // Calculate cone for active profile
+        const cone = calculateCone(activeResult.adjustedReturn, state.horizon, state.amount);
+
+        if (els.bigNumber) els.bigNumber.textContent = formatCurrency(activeResult.finalValue);
         if (els.subtitle) els.subtitle.textContent = `Projection sur ${state.horizon} ans`;
-        if (els.statGain) els.statGain.textContent = formatCurrency(result.totalGain);
-        if (els.statReturn) els.statReturn.textContent = result.annualReturn.toFixed(1) + '%';
+        if (els.statGain) els.statGain.textContent = formatCurrency(activeResult.totalGain);
+        if (els.statReturn) els.statReturn.textContent = activeResult.annualReturn.toFixed(1) + '%';
         if (els.statAlloc) els.statAlloc.textContent = cycle.allocation.actions + '% Actions';
 
-        drawChart(result.points);
-        generateAnalysis(result, cycle, profile);
+        drawChart(allResults, cone);
+        updateGoalBadge(activeResult.points);
+        generateAnalysis(activeResult, cycle, profile);
+    }
+
+    // ── Goal Badge ──
+    function updateGoalBadge(points) {
+        if (!els.goalBadge) return;
+
+        if (!state.goalAmount) {
+            els.goalBadge.style.display = 'none';
+            return;
+        }
+
+        const goalResult = calculateGoalYear(points, state.goalAmount);
+        els.goalBadge.style.display = 'flex';
+
+        if (goalResult.achieved) {
+            els.goalBadge.className = 'goal-badge achieved';
+            els.goalBadgeText.textContent = `Objectif atteint en ${goalResult.year} an${goalResult.year > 1 ? 's' : ''}`;
+            // Update lucide icon to check-circle
+            const icon = els.goalBadge.querySelector('i, svg');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'check-circle');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        } else {
+            els.goalBadge.className = 'goal-badge not-achieved';
+            els.goalBadgeText.textContent = `Objectif non atteint sur ${state.horizon} ans — augmentez l'horizon ou le montant`;
+            const icon = els.goalBadge.querySelector('i, svg');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'alert-circle');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        }
     }
 
     // ── SVG Chart ──
-    function drawChart(points) {
+    function drawChart(allResults, cone) {
         if (!els.chartSvg) return;
 
-        const width = 600, height = 180;
+        const width = 600, height = 240;
         const padding = { top: 20, right: 20, bottom: 30, left: 10 };
-        const xScale = (i) => padding.left + (i / (points.length - 1)) * (width - padding.left - padding.right);
-        const maxVal = Math.max(...points.map(p => p.value));
-        const minVal = Math.min(...points.map(p => p.value));
-        const range = maxVal - minVal || 1;
-        const yScale = (v) => padding.top + (1 - (v - minVal) / range) * (height - padding.top - padding.bottom);
+        const chartBottom = height - padding.bottom;
 
-        let linePath = `M ${xScale(0)} ${yScale(points[0].value)}`;
-        let areaPath = `M ${xScale(0)} ${height - padding.bottom} L ${xScale(0)} ${yScale(points[0].value)}`;
-        for (let i = 1; i < points.length; i++) {
-            const x = xScale(i), y = yScale(points[i].value);
-            const prevX = xScale(i - 1), prevY = yScale(points[i - 1].value);
-            const cpx = (prevX + x) / 2;
-            linePath += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
-            areaPath += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
+        // Find global min/max across all profiles + cone
+        let globalMax = 0, globalMin = Infinity;
+        PROFILE_KEYS.forEach(key => {
+            allResults[key].points.forEach(p => {
+                if (p.value > globalMax) globalMax = p.value;
+                if (p.value < globalMin) globalMin = p.value;
+            });
+        });
+        // Include cone bounds
+        if (cone) {
+            cone.optimiste.forEach(p => { if (p.value > globalMax) globalMax = p.value; });
+            cone.pessimiste.forEach(p => { if (p.value < globalMin) globalMin = p.value; });
         }
-        areaPath += ` L ${xScale(points.length - 1)} ${height - padding.bottom} Z`;
+        // Include goal line in scale
+        if (state.goalAmount) {
+            if (state.goalAmount > globalMax) globalMax = state.goalAmount * 1.05;
+        }
 
+        const range = globalMax - globalMin || 1;
+        const numPoints = allResults[state.profile].points.length;
+
+        const xScale = (i) => padding.left + (i / (numPoints - 1)) * (width - padding.left - padding.right);
+        const yScale = (v) => padding.top + (1 - (v - globalMin) / range) * (chartBottom - padding.top);
+
+        // Helper: build cubic bezier path from points array
+        function buildLinePath(points) {
+            let path = `M ${xScale(0)} ${yScale(points[0].value)}`;
+            for (let i = 1; i < points.length; i++) {
+                const x = xScale(i), y = yScale(points[i].value);
+                const prevX = xScale(i - 1), prevY = yScale(points[i - 1].value);
+                const cpx = (prevX + x) / 2;
+                path += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
+            }
+            return path;
+        }
+
+        function buildAreaPath(points) {
+            let path = `M ${xScale(0)} ${chartBottom} L ${xScale(0)} ${yScale(points[0].value)}`;
+            for (let i = 1; i < points.length; i++) {
+                const x = xScale(i), y = yScale(points[i].value);
+                const prevX = xScale(i - 1), prevY = yScale(points[i - 1].value);
+                const cpx = (prevX + x) / 2;
+                path += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
+            }
+            path += ` L ${xScale(points.length - 1)} ${chartBottom} Z`;
+            return path;
+        }
+
+        // ── Grid Lines ──
         let gridLines = '';
         for (let i = 0; i < 4; i++) {
-            const y = padding.top + (i / 3) * (height - padding.top - padding.bottom);
+            const y = padding.top + (i / 3) * (chartBottom - padding.top);
             gridLines += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" class="chart-gridline"/>`;
         }
 
+        // ── Year Labels ──
+        const points = allResults[state.profile].points;
         let yearLabels = '';
         const step = points.length <= 10 ? 1 : Math.ceil(points.length / 6);
         for (let i = 0; i < points.length; i += step) {
@@ -352,22 +501,115 @@
             yearLabels += `<text x="${xScale(points.length - 1)}" y="${height - 5}" class="chart-year-label">An ${points[points.length - 1].year}</text>`;
         }
 
-        els.chartSvg.innerHTML = `
-            <defs>
-                <linearGradient id="compas-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#0077b6"/>
-                    <stop offset="100%" stop-color="#00b4d8"/>
-                </linearGradient>
-                <linearGradient id="compas-area-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#0077b6" stop-opacity="0.2"/>
-                    <stop offset="100%" stop-color="#0077b6" stop-opacity="0"/>
-                </linearGradient>
-            </defs>
-            ${gridLines}
-            <path d="${areaPath}" class="chart-area"/>
-            <path d="${linePath}" class="chart-line"/>
-            ${yearLabels}
-        `;
+        // ── Defs (gradients) ──
+        let defs = '<defs>';
+        PROFILE_KEYS.forEach(key => {
+            const color = PROFILES[key].color;
+            defs += `
+                <linearGradient id="area-grad-${key}" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="${color}" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+                </linearGradient>`;
+        });
+        // Cone gradient for active profile
+        const activeColor = PROFILES[state.profile].color;
+        defs += `
+            <linearGradient id="cone-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.08"/>
+                <stop offset="100%" stop-color="${activeColor}" stop-opacity="0.02"/>
+            </linearGradient>`;
+        defs += '</defs>';
+
+        // ── Cone (probability area) ──
+        let coneSvg = '';
+        if (cone) {
+            // Build path: go forward along optimiste, then backward along pessimiste
+            let conePath = `M ${xScale(0)} ${yScale(cone.optimiste[0].value)}`;
+            for (let i = 1; i < cone.optimiste.length; i++) {
+                const x = xScale(i), y = yScale(cone.optimiste[i].value);
+                const prevX = xScale(i - 1), prevY = yScale(cone.optimiste[i - 1].value);
+                const cpx = (prevX + x) / 2;
+                conePath += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
+            }
+            // Go backward along pessimiste
+            for (let i = cone.pessimiste.length - 1; i >= 1; i--) {
+                const x = xScale(i), y = yScale(cone.pessimiste[i].value);
+                const nextX = xScale(i - 1), nextY = yScale(cone.pessimiste[i - 1].value);
+                // Reverse bezier
+                const cpx = (x + nextX) / 2;
+                if (i === cone.pessimiste.length - 1) {
+                    conePath += ` L ${x} ${y}`;
+                }
+                conePath += ` C ${cpx} ${y}, ${cpx} ${nextY}, ${nextX} ${nextY}`;
+            }
+            conePath += ' Z';
+
+            coneSvg = `<path d="${conePath}" class="chart-cone" fill="url(#cone-grad)"/>`;
+
+            // Cone borders (dashed)
+            const optPath = buildLinePath(cone.optimiste);
+            const pesPath = buildLinePath(cone.pessimiste);
+            coneSvg += `<path d="${optPath}" class="chart-cone-border" stroke="${activeColor}"/>`;
+            coneSvg += `<path d="${pesPath}" class="chart-cone-border" stroke="${activeColor}"/>`;
+        }
+
+        // ── Profile Curves ──
+        let curvesSvg = '';
+        // Draw inactive profiles first, then active on top
+        PROFILE_KEYS.forEach(key => {
+            const isActive = key === state.profile;
+            const color = PROFILES[key].color;
+            const pts = allResults[key].points;
+            const linePath = buildLinePath(pts);
+            const areaPath = buildAreaPath(pts);
+
+            if (isActive) {
+                curvesSvg += `<path d="${areaPath}" fill="url(#area-grad-${key})" class="chart-area-multi-active"/>`;
+                curvesSvg += `<path d="${linePath}" stroke="${color}" class="chart-line-active"/>`;
+            } else {
+                curvesSvg += `<path d="${areaPath}" fill="url(#area-grad-${key})" class="chart-area-multi"/>`;
+                curvesSvg += `<path d="${linePath}" stroke="${color}" class="chart-line-inactive"/>`;
+            }
+        });
+
+        // ── Goal Line ──
+        let goalSvg = '';
+        if (state.goalAmount && state.goalAmount > globalMin) {
+            const goalY = yScale(state.goalAmount);
+            if (goalY >= padding.top && goalY <= chartBottom) {
+                goalSvg += `<line x1="${padding.left}" y1="${goalY}" x2="${width - padding.right}" y2="${goalY}" class="chart-goal-line"/>`;
+                goalSvg += `<text x="${width - padding.right - 4}" y="${goalY - 6}" class="chart-goal-label" text-anchor="end">${formatCurrencyShort(state.goalAmount)}</text>`;
+
+                // Find intersection point with active profile
+                const activePoints = allResults[state.profile].points;
+                const goalResult = calculateGoalYear(activePoints, state.goalAmount);
+                if (goalResult.achieved) {
+                    const gx = xScale(goalResult.index);
+                    goalSvg += `<circle cx="${gx}" cy="${goalY}" r="4" class="chart-goal-dot"/>`;
+                }
+            }
+        }
+
+        // ── Legend (top right) ──
+        let legendSvg = '';
+        const legendX = width - padding.right - 130;
+        const legendY = padding.top + 2;
+        PROFILE_KEYS.forEach((key, i) => {
+            const color = PROFILES[key].color;
+            const isActive = key === state.profile;
+            const ly = legendY + i * 16;
+            const finalVal = formatCurrencyShort(allResults[key].finalValue);
+            const opacity = isActive ? 1 : 0.5;
+            const weight = isActive ? 800 : 600;
+            legendSvg += `<g class="chart-legend-item" opacity="${opacity}">`;
+            legendSvg += `<line x1="${legendX}" y1="${ly + 4}" x2="${legendX + 16}" y2="${ly + 4}" stroke="${color}" stroke-width="${isActive ? 3 : 1.5}" stroke-linecap="round"/>`;
+            legendSvg += `<text x="${legendX + 22}" y="${ly + 8}" fill="${color}" style="font-weight:${weight}">${PROFILES[key].name}</text>`;
+            legendSvg += `<text x="${legendX + 130}" y="${ly + 8}" class="chart-legend-value" text-anchor="end">${finalVal}</text>`;
+            legendSvg += `</g>`;
+        });
+
+        // ── Assemble ──
+        els.chartSvg.innerHTML = defs + gridLines + coneSvg + curvesSvg + goalSvg + yearLabels + legendSvg;
     }
 
     // ── AI Text Engine ──
@@ -538,12 +780,283 @@
         }
     }
 
+    // ═══════════════════════════════════════
+    //  V3 — PDF EXPORT
+    // ═══════════════════════════════════════
+
+    function generatePDF() {
+        if (typeof window.jspdf === 'undefined') {
+            alert('La librairie PDF n\'est pas encore chargée. Veuillez réessayer dans quelques secondes.');
+            return;
+        }
+
+        var jsPDF = window.jspdf.jsPDF;
+        var doc = new jsPDF('p', 'mm', 'letter');
+        var pageW = doc.internal.pageSize.getWidth();
+        var margin = 20;
+        var contentW = pageW - margin * 2;
+        var y = margin;
+
+        var clientName = els.clientName ? els.clientName.value.trim() : '';
+        var profile = PROFILES[state.profile];
+        var cycle = CYCLE_DATA[state.cycle];
+        var activeResult = calculateForProfile(state.profile);
+        var today = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // ── Header ──
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 119, 182);
+        doc.text('Compas Patrimonial I.A.', margin, y);
+        y += 7;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(90, 125, 149);
+        doc.text('Groupe Financier Ste-Foy', margin, y);
+
+        // Date + Name (right-aligned)
+        doc.setFontSize(9);
+        doc.text(today, pageW - margin, y, { align: 'right' });
+        y += 5;
+        if (clientName) {
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(10, 37, 64);
+            doc.text('Prepare pour : ' + clientName, pageW - margin, y, { align: 'right' });
+        }
+        y += 10;
+
+        // Separator line
+        doc.setDrawColor(0, 119, 182);
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, pageW - margin, y);
+        y += 10;
+
+        // ── Section: Profil d'investisseur ──
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(10, 37, 64);
+        doc.text('Profil d\'investisseur', margin, y);
+        y += 8;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(44, 74, 94);
+
+        var profileLines = [
+            ['Profil de risque', profile.name],
+            ['Rendement annuel estime', activeResult.annualReturn.toFixed(1) + '%'],
+            ['Cycle economique actif', cycle.name + ' (' + cycle.emoji + ')'],
+            ['Strategie recommandee', cycle.strategy],
+            ['Allocation', cycle.allocation.actions + '% Actions / ' + cycle.allocation.obligations + '% Obligations / ' + cycle.allocation.alternatif + '% Alternatif']
+        ];
+
+        profileLines.forEach(function(row) {
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(90, 125, 149);
+            doc.text(row[0] + ' :', margin, y);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(10, 37, 64);
+            doc.text(row[1], margin + 55, y);
+            y += 6;
+        });
+        y += 6;
+
+        // ── Section: Parametres ──
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(10, 37, 64);
+        doc.text('Parametres de simulation', margin, y);
+        y += 8;
+
+        doc.setFontSize(10);
+        var paramLines = [
+            ['Montant initial', formatCurrency(state.amount)],
+            ['Horizon de placement', state.horizon + ' ans']
+        ];
+        if (state.goalAmount) {
+            paramLines.push(['Objectif financier', formatCurrency(state.goalAmount)]);
+        }
+
+        paramLines.forEach(function(row) {
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(90, 125, 149);
+            doc.text(row[0] + ' :', margin, y);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(10, 37, 64);
+            doc.text(row[1], margin + 55, y);
+            y += 6;
+        });
+        y += 6;
+
+        // ── Section: Projection ──
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(10, 37, 64);
+        doc.text('Resultats de la projection', margin, y);
+        y += 8;
+
+        doc.setFontSize(10);
+        var resultLines = [
+            ['Valeur finale projetee', formatCurrency(activeResult.finalValue)],
+            ['Gain projete', formatCurrency(activeResult.totalGain)],
+            ['Multiplicateur', (activeResult.finalValue / state.amount).toFixed(1) + 'x']
+        ];
+
+        if (state.goalAmount) {
+            var goalRes = calculateGoalYear(activeResult.points, state.goalAmount);
+            if (goalRes.achieved) {
+                resultLines.push(['Objectif atteint en', goalRes.year + ' ans']);
+            } else {
+                resultLines.push(['Objectif', 'Non atteint sur ' + state.horizon + ' ans']);
+            }
+        }
+
+        resultLines.forEach(function(row) {
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(90, 125, 149);
+            doc.text(row[0] + ' :', margin, y);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 119, 182);
+            doc.text(row[1], margin + 55, y);
+            y += 6;
+        });
+        y += 6;
+
+        // ── Section: Chart Image ──
+        try {
+            var svgEl = els.chartSvg;
+            if (svgEl) {
+                var svgData = new XMLSerializer().serializeToString(svgEl);
+                // Create a canvas to render SVG
+                var canvas = document.createElement('canvas');
+                canvas.width = 1200;
+                canvas.height = 480;
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                var img = new Image();
+                var svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                var url = URL.createObjectURL(svgBlob);
+
+                // Use synchronous approach: draw chart placeholder text for now
+                // The async image load will be handled with a promise
+                var chartPromise = new Promise(function(resolve) {
+                    img.onload = function() {
+                        ctx.drawImage(img, 0, 0, 1200, 480);
+                        URL.revokeObjectURL(url);
+                        var dataUrl = canvas.toDataURL('image/png');
+                        resolve(dataUrl);
+                    };
+                    img.onerror = function() {
+                        URL.revokeObjectURL(url);
+                        resolve(null);
+                    };
+                    img.src = url;
+                });
+
+                chartPromise.then(function(dataUrl) {
+                    if (dataUrl) {
+                        doc.setFontSize(13);
+                        doc.setFont(undefined, 'bold');
+                        doc.setTextColor(10, 37, 64);
+                        doc.text('Graphique de projection', margin, y);
+                        y += 4;
+
+                        var chartH = contentW * 0.4;
+                        doc.addImage(dataUrl, 'PNG', margin, y, contentW, chartH);
+                        y += chartH + 8;
+
+                        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName);
+                    } else {
+                        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName);
+                    }
+                });
+                return; // async path
+            }
+        } catch (e) {
+            // If SVG conversion fails, continue without chart
+        }
+
+        finalizePDF(doc, y, margin, pageW, contentW, activeResult, cycle, profile, clientName);
+    }
+
+    function finalizePDF(doc, y, margin, pageW, contentW, result, cycle, profile, clientName) {
+        // ── Section: AI Analysis ──
+        if (y > 220) {
+            doc.addPage();
+            y = 20;
+        }
+
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(10, 37, 64);
+        doc.text('Analyse du Compas I.A.', margin, y);
+        y += 8;
+
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(44, 74, 94);
+
+        // Get plain text from analysis
+        var analysisText = buildAnalysisText(result, cycle, profile);
+        var plainText = analysisText.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+
+        var splitText = doc.splitTextToSize(plainText, contentW);
+        doc.text(splitText, margin, y);
+        y += splitText.length * 4.5 + 10;
+
+        // ── Disclaimer + Footer ──
+        if (y > 240) {
+            doc.addPage();
+            y = 20;
+        }
+
+        // Separator
+        doc.setDrawColor(200, 210, 220);
+        doc.setLineWidth(0.3);
+        doc.line(margin, y, pageW - margin, y);
+        y += 8;
+
+        doc.setFontSize(7.5);
+        doc.setFont(undefined, 'italic');
+        doc.setTextColor(160, 180, 196);
+        var disclaimer = 'Simulation a titre indicatif seulement. Les rendements passes ne garantissent pas les rendements futurs. Ce document ne constitue pas un conseil financier. Consultez un professionnel avant de prendre toute decision d\'investissement.';
+        var disclaimerLines = doc.splitTextToSize(disclaimer, contentW);
+        doc.text(disclaimerLines, margin, y);
+        y += disclaimerLines.length * 3.5 + 8;
+
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(90, 125, 149);
+        doc.setFontSize(8);
+        doc.text('Groupe Financier Ste-Foy', margin, y);
+        doc.text('418-577-2087 | groupefinancierstefoy.com', pageW - margin, y, { align: 'right' });
+
+        // Save
+        var fileName = 'Compas-Patrimonial';
+        if (clientName) {
+            fileName += '-' + clientName.replace(/[^a-zA-Z0-9\u00C0-\u024F]/g, '-');
+        }
+        doc.save(fileName + '.pdf');
+    }
+
     // ── Helpers ──
     function formatCurrency(num) {
         if (num >= 1000000) {
             return (num / 1000000).toFixed(2).replace('.', ',') + ' M$';
         }
         return num.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function formatCurrencyShort(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1).replace('.', ',') + 'M$';
+        }
+        if (num >= 1000) {
+            return Math.round(num / 1000) + 'k$';
+        }
+        return num.toLocaleString('fr-CA') + '$';
     }
 
     // ── Boot ──
