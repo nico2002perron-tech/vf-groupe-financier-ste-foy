@@ -2003,6 +2003,10 @@ footer {
     transition-delay: 0.4s;
 }
 
+.delay-5 {
+    transition-delay: 0.5s;
+}
+
 /* =========================================
    TEXT GRADIENTS V8 (CENTER TITLE)
    ========================================= */

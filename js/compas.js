@@ -13,6 +13,13 @@
     const INFLATION_RATE = 0.02;
     const MC_NUM_SIMS = 500;
 
+    // ── S&P 500 Benchmark (total return, dividendes réinvestis) ──
+    const SP500_BENCHMARK = {
+        hist: { value: 10, label: 'historique (depuis 1957)' },
+        ten: { value: 14, label: '10 ans (2015-2024)' },
+        disclaimer: 'Rendements passés du S&P 500. Ne garantissent pas les rendements futurs.'
+    };
+
     // ── Cycle Phase Data ──
     const CYCLE_DATA = {
         expansion: {
@@ -150,11 +157,18 @@
         adjustInflation: false,
         profile: 'equilibre',
         cycle: 'expansion',
-        goalAmount: null
+        goalAmount: null,
+        showMonteCarlo: false
     };
 
     // Cached MC results for use in analysis/PDF
     let lastMcResults = null;
+
+    // Chart metadata for tooltip interactivity
+    let chartMeta = null;
+
+    // Animation state for fourchette numbers
+    let animationState = { lowVal: 0, highVal: 0 };
 
     let quizState = {
         currentQuestion: 0,
@@ -178,6 +192,16 @@
             goalBadge: document.getElementById('goal-badge'),
             goalBadgeText: document.getElementById('goal-badge-text'),
             inflationToggle: document.getElementById('compas-inflation-toggle'),
+            mcToggle: document.getElementById('compas-mc-toggle'),
+            mcPanel: document.getElementById('mc-panel'),
+            mcFillP10: document.getElementById('mc-fill-p10'),
+            mcFillP50: document.getElementById('mc-fill-p50'),
+            mcFillP90: document.getElementById('mc-fill-p90'),
+            mcValP10: document.getElementById('mc-val-p10'),
+            mcValP50: document.getElementById('mc-val-p50'),
+            mcValP90: document.getElementById('mc-val-p90'),
+            mcRiskFill: document.getElementById('mc-risk-fill'),
+            mcRiskLabel: document.getElementById('mc-risk-label'),
             profileBtns: document.querySelectorAll('.profile-btn'),
             chartSvg: document.getElementById('compas-svg-chart'),
             bigNumber: document.getElementById('compas-big-number'),
@@ -187,10 +211,18 @@
             cycleName: document.getElementById('compas-cycle-name'),
             cycleDesc: document.getElementById('compas-cycle-desc'),
             statGain: document.getElementById('stat-gain'),
-            statReturn: document.getElementById('stat-return'),
+            statReturnLow: document.getElementById('stat-return-low'),
+            statReturnHigh: document.getElementById('stat-return-high'),
+            sp500ArrowHist: document.getElementById('sp500-arrow-hist'),
+            sp500ArrowTen: document.getElementById('sp500-arrow-ten'),
             statAlloc: document.getElementById('stat-alloc'),
             pdfBtn: document.getElementById('compas-pdf-btn'),
             clientName: document.getElementById('compas-client-name'),
+            // Chart tooltip
+            chartWrap: document.getElementById('compas-chart-wrap'),
+            chartCrosshair: document.getElementById('chart-crosshair'),
+            chartHoverDot: document.getElementById('chart-hover-dot'),
+            chartTooltip: document.getElementById('chart-tooltip'),
             // V2
             discoverBtn: document.getElementById('compas-discover-btn'),
             quizOverlay: document.getElementById('quiz-overlay'),
@@ -218,6 +250,9 @@
         }
         if (els.inflationToggle) {
             els.inflationToggle.addEventListener('change', onInflationToggle);
+        }
+        if (els.mcToggle) {
+            els.mcToggle.addEventListener('change', onMcToggle);
         }
         if (els.goalSlider) {
             els.goalSlider.addEventListener('input', onGoalChange);
@@ -272,6 +307,17 @@
         // V3: PDF button
         if (els.pdfBtn) {
             els.pdfBtn.addEventListener('click', generatePDF);
+        }
+
+        // Chart tooltip interactions
+        if (els.chartWrap) {
+            els.chartWrap.addEventListener('mousemove', updateChartTooltip);
+            els.chartWrap.addEventListener('touchmove', function (e) {
+                e.preventDefault();
+                updateChartTooltip(e.touches[0]);
+            }, { passive: false });
+            els.chartWrap.addEventListener('mouseleave', hideChartTooltip);
+            els.chartWrap.addEventListener('touchend', hideChartTooltip);
         }
 
         update();
@@ -342,6 +388,11 @@
 
     function onInflationToggle() {
         state.adjustInflation = els.inflationToggle.checked;
+        update();
+    }
+
+    function onMcToggle() {
+        state.showMonteCarlo = els.mcToggle.checked;
         update();
     }
 
@@ -461,6 +512,61 @@
         return { year: null, index: null, achieved: false };
     }
 
+    // ── Monte Carlo Panel ──
+    function updateMcPanel(mcResults) {
+        if (!els.mcPanel) return;
+
+        if (!state.showMonteCarlo || !mcResults) {
+            els.mcPanel.style.display = 'none';
+            return;
+        }
+
+        els.mcPanel.style.display = '';
+
+        // Calculate relative bar widths (P90 = 100%)
+        const maxVal = mcResults.finalP90;
+        const p10Pct = maxVal > 0 ? Math.round((mcResults.finalP10 / maxVal) * 100) : 0;
+        const p50Pct = maxVal > 0 ? Math.round((mcResults.finalP50 / maxVal) * 100) : 0;
+        const p90Pct = 100;
+
+        // Animate bar fills with a small delay for visual effect
+        requestAnimationFrame(() => {
+            if (els.mcFillP10) els.mcFillP10.style.width = p10Pct + '%';
+            if (els.mcFillP50) els.mcFillP50.style.width = p50Pct + '%';
+            if (els.mcFillP90) els.mcFillP90.style.width = p90Pct + '%';
+        });
+
+        // Update text values
+        if (els.mcValP10) els.mcValP10.textContent = formatCurrency(mcResults.finalP10);
+        if (els.mcValP50) els.mcValP50.textContent = formatCurrency(mcResults.finalP50);
+        if (els.mcValP90) els.mcValP90.textContent = formatCurrency(mcResults.finalP90);
+
+        // Risk gauge
+        const probPct = Math.round(mcResults.probLoss * 100);
+        if (els.mcRiskFill) {
+            els.mcRiskFill.style.width = probPct + '%';
+            // Dynamic color
+            if (probPct === 0) {
+                els.mcRiskFill.style.backgroundColor = '#10b981';
+            } else if (probPct <= 10) {
+                els.mcRiskFill.style.backgroundColor = '#10b981';
+            } else if (probPct <= 20) {
+                els.mcRiskFill.style.backgroundColor = '#f59e0b';
+            } else {
+                els.mcRiskFill.style.backgroundColor = '#ef4444';
+            }
+        }
+
+        if (els.mcRiskLabel) {
+            els.mcRiskLabel.textContent = probPct === 0
+                ? 'Aucun risque de perte'
+                : probPct + '% risque de perte';
+        }
+
+        // Refresh Lucide icons in panel
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
     // ── Update All ──
     function update() {
         const allResults = calculateAllProfiles();
@@ -490,18 +596,32 @@
         // Gain stat — subtract contributions from gain
         if (els.statGain) els.statGain.textContent = formatCurrency(activeResult.totalGain);
 
-        // Vague return range instead of precise %
-        if (els.statReturn) {
-            const lowReturn = Math.max(0, (activeResult.adjustedReturn - profile.volatility / 2) * 100);
-            const highReturn = (activeResult.adjustedReturn + profile.volatility / 2) * 100;
-            els.statReturn.textContent = Math.round(lowReturn) + '% — ' + Math.round(highReturn) + '%';
+        // Animated return range
+        const lowReturn = Math.max(0, Math.round((activeResult.adjustedReturn - profile.volatility / 2) * 100));
+        const highReturn = Math.round((activeResult.adjustedReturn + profile.volatility / 2) * 100);
+
+        if (els.statReturnLow) {
+            animateNumber(els.statReturnLow, animationState.lowVal, lowReturn, 600);
+            animationState.lowVal = lowReturn;
         }
+        if (els.statReturnHigh) {
+            animateNumber(els.statReturnHigh, animationState.highVal, highReturn, 600);
+            animationState.highVal = highReturn;
+        }
+
+        // S&P 500 comparison arrows
+        updateSP500Arrows(lowReturn, highReturn);
 
         if (els.statAlloc) els.statAlloc.textContent = cycle.allocation.actions + '% Actions';
 
-        drawChart(allResults, mcResults);
+        // MC panel: show/hide based on toggle
+        updateMcPanel(mcResults);
+
+        // Pass MC to chart/analysis only when toggle is ON
+        const mcForDisplay = state.showMonteCarlo ? mcResults : null;
+        drawChart(allResults, mcForDisplay);
         updateGoalBadge(activeResult.points);
-        generateAnalysis(activeResult, cycle, profile, mcResults);
+        generateAnalysis(activeResult, cycle, profile, mcForDisplay);
     }
 
     // ── Goal Badge ──
@@ -535,34 +655,33 @@
         }
     }
 
-    // ── SVG Chart ──
+    // ── SVG Chart (Simplified: 1 curve + 1 MC band) ──
     function drawChart(allResults, mcResults) {
         if (!els.chartSvg) return;
 
         const width = 600, height = 240;
         const padding = { top: 20, right: 20, bottom: 30, left: 10 };
         const chartBottom = height - padding.bottom;
+        const activeKey = state.profile;
+        const activePoints = allResults[activeKey].points;
+        const activeColor = PROFILES[activeKey].color;
 
-        // Find global min/max across all profiles + MC bands
+        // Find min/max from active profile + P25/P75 + goal only
         let globalMax = 0, globalMin = Infinity;
-        PROFILE_KEYS.forEach(key => {
-            allResults[key].points.forEach(p => {
-                if (p.value > globalMax) globalMax = p.value;
-                if (p.value < globalMin) globalMin = p.value;
-            });
+        activePoints.forEach(p => {
+            if (p.value > globalMax) globalMax = p.value;
+            if (p.value < globalMin) globalMin = p.value;
         });
-        // Include MC P10-P90 bounds
         if (mcResults) {
-            mcResults.percentileData.p90.forEach(p => { if (p.value > globalMax) globalMax = p.value; });
-            mcResults.percentileData.p10.forEach(p => { if (p.value < globalMin) globalMin = p.value; });
+            mcResults.percentileData.p75.forEach(p => { if (p.value > globalMax) globalMax = p.value; });
+            mcResults.percentileData.p25.forEach(p => { if (p.value < globalMin) globalMin = p.value; });
         }
-        // Include goal line in scale
-        if (state.goalAmount) {
-            if (state.goalAmount > globalMax) globalMax = state.goalAmount * 1.05;
+        if (state.goalAmount && state.goalAmount > globalMax) {
+            globalMax = state.goalAmount * 1.05;
         }
 
         const range = globalMax - globalMin || 1;
-        const numPoints = allResults[state.profile].points.length;
+        const numPoints = activePoints.length;
 
         const xScale = (i) => padding.left + (i / (numPoints - 1)) * (width - padding.left - padding.right);
         const yScale = (v) => padding.top + (1 - (v - globalMin) / range) * (chartBottom - padding.top);
@@ -591,9 +710,7 @@
             return path;
         }
 
-        // Build a closed band path between two point arrays (upper forward, lower backward)
         function buildBandPath(upperPoints, lowerPoints) {
-            // Forward along upper
             let path = `M ${xScale(0)} ${yScale(upperPoints[0].value)}`;
             for (let i = 1; i < upperPoints.length; i++) {
                 const x = xScale(i), y = yScale(upperPoints[i].value);
@@ -601,7 +718,6 @@
                 const cpx = (prevX + x) / 2;
                 path += ` C ${cpx} ${prevY}, ${cpx} ${y}, ${x} ${y}`;
             }
-            // Backward along lower
             const last = lowerPoints.length - 1;
             path += ` L ${xScale(last)} ${yScale(lowerPoints[last].value)}`;
             for (let i = last - 1; i >= 0; i--) {
@@ -622,67 +738,39 @@
         }
 
         // ── Year Labels ──
-        const points = allResults[state.profile].points;
         let yearLabels = '';
-        const step = points.length <= 10 ? 1 : Math.ceil(points.length / 6);
-        for (let i = 0; i < points.length; i += step) {
-            yearLabels += `<text x="${xScale(i)}" y="${height - 5}" class="chart-year-label">An ${points[i].year}</text>`;
+        const step = numPoints <= 10 ? 1 : Math.ceil(numPoints / 6);
+        for (let i = 0; i < numPoints; i += step) {
+            yearLabels += `<text x="${xScale(i)}" y="${height - 5}" class="chart-year-label">An ${activePoints[i].year}</text>`;
         }
-        if ((points.length - 1) % step !== 0) {
-            yearLabels += `<text x="${xScale(points.length - 1)}" y="${height - 5}" class="chart-year-label">An ${points[points.length - 1].year}</text>`;
+        if ((numPoints - 1) % step !== 0) {
+            yearLabels += `<text x="${xScale(numPoints - 1)}" y="${height - 5}" class="chart-year-label">An ${activePoints[numPoints - 1].year}</text>`;
         }
 
-        // ── Defs (gradients) ──
-        const activeColor = PROFILES[state.profile].color;
-        let defs = '<defs>';
-        PROFILE_KEYS.forEach(key => {
-            const color = PROFILES[key].color;
-            defs += `
-                <linearGradient id="area-grad-${key}" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="${color}" stop-opacity="0.2"/>
-                    <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-                </linearGradient>`;
-        });
-        // MC band gradients
-        defs += `
-            <linearGradient id="mc-band-outer-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.06"/>
-                <stop offset="100%" stop-color="${activeColor}" stop-opacity="0.02"/>
+        // ── Defs (single gradient) ──
+        let defs = `<defs>
+            <linearGradient id="area-grad-${activeKey}" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="${activeColor}" stop-opacity="0"/>
             </linearGradient>
             <linearGradient id="mc-band-inner-grad" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.12"/>
                 <stop offset="100%" stop-color="${activeColor}" stop-opacity="0.04"/>
-            </linearGradient>`;
-        defs += '</defs>';
+            </linearGradient>
+        </defs>`;
 
-        // ── Monte Carlo Bands ──
+        // ── Monte Carlo Band (P25-P75 only) ──
         let mcSvg = '';
         if (mcResults) {
             const pd = mcResults.percentileData;
-            // Outer band: P10 — P90
-            mcSvg += `<path d="${buildBandPath(pd.p90, pd.p10)}" class="chart-mc-band-outer" fill="url(#mc-band-outer-grad)"/>`;
-            // Inner band: P25 — P75
             mcSvg += `<path d="${buildBandPath(pd.p75, pd.p25)}" class="chart-mc-band-inner" fill="url(#mc-band-inner-grad)"/>`;
         }
 
-        // ── Profile Curves ──
-        let curvesSvg = '';
-        // Draw inactive profiles first, then active on top
-        PROFILE_KEYS.forEach(key => {
-            const isActive = key === state.profile;
-            const color = PROFILES[key].color;
-            const pts = allResults[key].points;
-            const linePath = buildLinePath(pts);
-            const areaPath = buildAreaPath(pts);
-
-            if (isActive) {
-                curvesSvg += `<path d="${areaPath}" fill="url(#area-grad-${key})" class="chart-area-multi-active"/>`;
-                curvesSvg += `<path d="${linePath}" stroke="${color}" class="chart-line-active"/>`;
-            } else {
-                curvesSvg += `<path d="${areaPath}" fill="url(#area-grad-${key})" class="chart-area-multi"/>`;
-                curvesSvg += `<path d="${linePath}" stroke="${color}" class="chart-line-inactive"/>`;
-            }
-        });
+        // ── Single Active Curve ──
+        const linePath = buildLinePath(activePoints);
+        const areaPath = buildAreaPath(activePoints);
+        let curvesSvg = `<path d="${areaPath}" fill="url(#area-grad-${activeKey})" class="chart-area-multi-active"/>`;
+        curvesSvg += `<path d="${linePath}" stroke="${activeColor}" class="chart-line-active"/>`;
 
         // ── Goal Line ──
         let goalSvg = '';
@@ -691,9 +779,6 @@
             if (goalY >= padding.top && goalY <= chartBottom) {
                 goalSvg += `<line x1="${padding.left}" y1="${goalY}" x2="${width - padding.right}" y2="${goalY}" class="chart-goal-line"/>`;
                 goalSvg += `<text x="${width - padding.right - 4}" y="${goalY - 6}" class="chart-goal-label" text-anchor="end">${formatCurrencyShort(state.goalAmount)}</text>`;
-
-                // Find intersection point with active profile
-                const activePoints = allResults[state.profile].points;
                 const goalResult = calculateGoalYear(activePoints, state.goalAmount);
                 if (goalResult.achieved) {
                     const gx = xScale(goalResult.index);
@@ -702,26 +787,131 @@
             }
         }
 
-        // ── Legend (top right) ──
-        let legendSvg = '';
-        const legendX = width - padding.right - 130;
-        const legendY = padding.top + 2;
-        PROFILE_KEYS.forEach((key, i) => {
-            const color = PROFILES[key].color;
-            const isActive = key === state.profile;
-            const ly = legendY + i * 16;
-            const finalVal = formatCurrencyShort(allResults[key].finalValue);
-            const opacity = isActive ? 1 : 0.5;
-            const weight = isActive ? 800 : 600;
-            legendSvg += `<g class="chart-legend-item" opacity="${opacity}">`;
-            legendSvg += `<line x1="${legendX}" y1="${ly + 4}" x2="${legendX + 16}" y2="${ly + 4}" stroke="${color}" stroke-width="${isActive ? 3 : 1.5}" stroke-linecap="round"/>`;
-            legendSvg += `<text x="${legendX + 22}" y="${ly + 8}" fill="${color}" style="font-weight:${weight}">${PROFILES[key].name}</text>`;
-            legendSvg += `<text x="${legendX + 130}" y="${ly + 8}" class="chart-legend-value" text-anchor="end">${finalVal}</text>`;
-            legendSvg += `</g>`;
-        });
+        // ── Simple Legend (top right: colored dot + profile name + final value) ──
+        const finalVal = formatCurrencyShort(allResults[activeKey].finalValue);
+        const legendX = width - padding.right - 4;
+        const legendY = padding.top + 12;
+        let legendSvg = `<g class="chart-legend-item">`;
+        legendSvg += `<circle cx="${legendX - 90}" cy="${legendY - 3}" r="4" fill="${activeColor}"/>`;
+        legendSvg += `<text x="${legendX - 82}" y="${legendY}" fill="${activeColor}" text-anchor="start" style="font-weight:800;font-size:10px;font-family:'Inter','Open Sans',sans-serif">${PROFILES[activeKey].name} · ${finalVal}</text>`;
+        legendSvg += `</g>`;
 
         // ── Assemble ──
         els.chartSvg.innerHTML = defs + gridLines + mcSvg + curvesSvg + goalSvg + yearLabels + legendSvg;
+
+        // ── Store chart metadata for tooltip ──
+        chartMeta = {
+            width, height, padding, chartBottom, numPoints, globalMin, globalMax, range,
+            xScale, yScale, activeColor,
+            points: activePoints,
+            mcP25: mcResults ? mcResults.percentileData.p25 : null,
+            mcP75: mcResults ? mcResults.percentileData.p75 : null
+        };
+    }
+
+    // ── Animated Numbers ──
+    function animateNumber(el, from, to, duration) {
+        if (from === to) { el.textContent = to; return; }
+        const start = performance.now();
+        const diff = to - from;
+        function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            // ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(from + diff * eased);
+            if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    // ── S&P 500 Arrows ──
+    function updateSP500Arrows(lowReturn, highReturn) {
+        function setArrow(el, benchmarkValue) {
+            if (!el) return;
+            // Remove all arrow classes
+            el.className = 'sp500-arrow';
+            if (benchmarkValue > highReturn) {
+                el.classList.add('sp500-arrow--up'); // S&P above user range
+            } else if (benchmarkValue < lowReturn) {
+                el.classList.add('sp500-arrow--down'); // S&P below user range
+            } else {
+                el.classList.add('sp500-arrow--neutral'); // S&P within range
+            }
+        }
+        setArrow(els.sp500ArrowHist, SP500_BENCHMARK.hist.value);
+        setArrow(els.sp500ArrowTen, SP500_BENCHMARK.ten.value);
+    }
+
+    // ── Chart Tooltip ──
+    function updateChartTooltip(e) {
+        if (!chartMeta || !els.chartWrap) return;
+
+        const rect = els.chartWrap.getBoundingClientRect();
+        const mouseX = (e.clientX || e.pageX) - rect.left;
+        const containerWidth = rect.width;
+
+        // Map pixel position to SVG coordinate
+        const svgX = (mouseX / containerWidth) * chartMeta.width;
+
+        // Find the closest data index
+        const { padding, width, numPoints, points, mcP25, mcP75, activeColor, yScale } = chartMeta;
+        const chartAreaWidth = width - padding.left - padding.right;
+        const relX = svgX - padding.left;
+        let idx = Math.round((relX / chartAreaWidth) * (numPoints - 1));
+        idx = Math.max(0, Math.min(numPoints - 1, idx));
+
+        const pointValue = points[idx].value;
+        const pointYear = points[idx].year;
+
+        // Pixel position of the dot
+        const dotPixelX = (chartMeta.xScale(idx) / chartMeta.width) * containerWidth;
+        const dotPixelY = (yScale(pointValue) / chartMeta.height) * rect.height;
+
+        // Show crosshair
+        els.chartCrosshair.style.left = dotPixelX + 'px';
+        els.chartCrosshair.classList.add('visible');
+
+        // Show dot
+        els.chartHoverDot.style.left = dotPixelX + 'px';
+        els.chartHoverDot.style.top = dotPixelY + 'px';
+        els.chartHoverDot.style.borderColor = activeColor;
+        els.chartHoverDot.style.background = activeColor;
+        els.chartHoverDot.classList.add('visible');
+
+        // Build tooltip content
+        const tooltipYear = els.chartTooltip.querySelector('.chart-tooltip-year');
+        const tooltipValue = els.chartTooltip.querySelector('.chart-tooltip-value');
+        const tooltipRange = els.chartTooltip.querySelector('.chart-tooltip-range');
+
+        tooltipYear.textContent = 'An ' + pointYear;
+        tooltipValue.textContent = formatCurrency(pointValue);
+
+        if (mcP25 && mcP75 && mcP25[idx] && mcP75[idx]) {
+            tooltipRange.textContent = formatCurrencyShort(mcP25[idx].value) + ' — ' + formatCurrencyShort(mcP75[idx].value);
+            tooltipRange.style.display = '';
+        } else {
+            tooltipRange.style.display = 'none';
+        }
+
+        // Position tooltip (flip if near edge)
+        els.chartTooltip.classList.add('visible');
+        const tooltipW = els.chartTooltip.offsetWidth;
+        let tooltipLeft = dotPixelX + 14;
+        if (dotPixelX + tooltipW + 20 > containerWidth) {
+            tooltipLeft = dotPixelX - tooltipW - 14;
+        }
+        let tooltipTop = dotPixelY - 16;
+        if (tooltipTop < 4) tooltipTop = dotPixelY + 20;
+
+        els.chartTooltip.style.left = tooltipLeft + 'px';
+        els.chartTooltip.style.top = tooltipTop + 'px';
+    }
+
+    function hideChartTooltip() {
+        if (els.chartCrosshair) els.chartCrosshair.classList.remove('visible');
+        if (els.chartHoverDot) els.chartHoverDot.classList.remove('visible');
+        if (els.chartTooltip) els.chartTooltip.classList.remove('visible');
     }
 
     // ── AI Text Engine ──
@@ -787,6 +977,9 @@
             contribInsight = ` Vos versements réguliers de <strong>${formatCurrency(contribution)}/mois</strong> contribuent <strong>${formatCurrency(totalContributions)}</strong> sur la période, amplifiant significativement l'effet des intérêts composés.`;
         }
 
+        // S&P 500 benchmark context
+        let benchmarkNote = ` À titre de référence, les marchés nord-américains (S&P 500) ont historiquement généré en moyenne environ <strong>${SP500_BENCHMARK.hist.value}%</strong> par an sur le long terme — un repère utile, mais qui ne garantit pas les rendements futurs.`;
+
         // Inflation note
         let inflationNote = '';
         if (state.adjustInflation) {
@@ -801,7 +994,7 @@
         else
             closing = ' Une révision annuelle avec votre conseiller permettra d\'ajuster la stratégie au fil des cycles.';
 
-        return opening + cycleAnalysis + mcInsight + contribInsight + inflationNote + closing;
+        return opening + cycleAnalysis + mcInsight + contribInsight + benchmarkNote + inflationNote + closing;
     }
 
     // ═══════════════════════════════════════
@@ -936,42 +1129,40 @@
         var today = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
 
         // ── Header ──
-        doc.setFontSize(18);
+        doc.setFontSize(16);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(0, 119, 182);
-        doc.text('Compas Patrimonial I.A.', margin, y);
-        y += 7;
+        pdfText(doc, 'Compas Patrimonial I.A.', margin, y);
 
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(90, 125, 149);
-        doc.text('Groupe Financier Ste-Foy', margin, y);
+        pdfText(doc, 'Groupe Financier Ste-Foy', margin, y + 5);
 
         // Date + Name (right-aligned)
-        doc.setFontSize(9);
-        doc.text(today, pageW - margin, y, { align: 'right' });
-        y += 5;
+        doc.setFontSize(8);
+        pdfText(doc, today, pageW - margin, y, { align: 'right' });
         if (clientName) {
             doc.setFont(undefined, 'bold');
             doc.setTextColor(10, 37, 64);
-            doc.text('Prepare pour : ' + clientName, pageW - margin, y, { align: 'right' });
+            pdfText(doc, 'Prepare pour : ' + clientName, pageW - margin, y + 5, { align: 'right' });
         }
-        y += 10;
+        y += 12;
 
         // Separator line
         doc.setDrawColor(0, 119, 182);
         doc.setLineWidth(0.5);
         doc.line(margin, y, pageW - margin, y);
-        y += 10;
+        y += 7;
 
         // ── Section: Profil d'investisseur ──
-        doc.setFontSize(13);
+        doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(10, 37, 64);
-        doc.text('Profil d\'investisseur', margin, y);
-        y += 8;
+        pdfText(doc, 'Profil d\'investisseur', margin, y);
+        y += 6;
 
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(44, 74, 94);
 
@@ -982,30 +1173,31 @@
         var profileLines = [
             ['Profil de risque', profile.name],
             ['Fourchette de rendement', lowRet + '% - ' + highRet + '%'],
-            ['Cycle economique actif', cycle.name + ' (' + cycle.emoji + ')'],
+            ['Ref. S&P 500', '~' + SP500_BENCHMARK.hist.value + '% hist. / ~' + SP500_BENCHMARK.ten.value + '% (10 ans)*'],
+            ['Cycle economique actif', cycle.name],
             ['Strategie recommandee', cycle.strategy],
-            ['Allocation', cycle.allocation.actions + '% Actions / ' + cycle.allocation.obligations + '% Obligations / ' + cycle.allocation.alternatif + '% Alternatif']
+            ['Allocation', cycle.allocation.actions + '% Act. / ' + cycle.allocation.obligations + '% Obl. / ' + cycle.allocation.alternatif + '% Alt.']
         ];
 
         profileLines.forEach(function(row) {
             doc.setFont(undefined, 'bold');
             doc.setTextColor(90, 125, 149);
-            doc.text(row[0] + ' :', margin, y);
+            pdfText(doc, row[0] + ' :', margin, y);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(10, 37, 64);
-            doc.text(row[1], margin + 55, y);
-            y += 6;
+            pdfText(doc, row[1], margin + 50, y);
+            y += 5;
         });
-        y += 6;
+        y += 4;
 
         // ── Section: Parametres ──
-        doc.setFontSize(13);
+        doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(10, 37, 64);
-        doc.text('Parametres de simulation', margin, y);
-        y += 8;
+        pdfText(doc, 'Parametres de simulation', margin, y);
+        y += 6;
 
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         var paramLines = [
             ['Montant initial', formatCurrency(state.amount)],
             ['Horizon de placement', state.horizon + ' ans']
@@ -1024,22 +1216,22 @@
         paramLines.forEach(function(row) {
             doc.setFont(undefined, 'bold');
             doc.setTextColor(90, 125, 149);
-            doc.text(row[0] + ' :', margin, y);
+            pdfText(doc, row[0] + ' :', margin, y);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(10, 37, 64);
-            doc.text(row[1], margin + 55, y);
-            y += 6;
+            pdfText(doc, row[1], margin + 50, y);
+            y += 5;
         });
-        y += 6;
+        y += 4;
 
         // ── Section: Projection ──
-        doc.setFontSize(13);
+        doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(10, 37, 64);
-        doc.text('Resultats de la projection', margin, y);
-        y += 8;
+        pdfText(doc, 'Resultats de la projection', margin, y);
+        y += 6;
 
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         var resultLines = [
             ['Valeur finale projetee', formatCurrency(activeResult.finalValue)],
             ['Gain projete', formatCurrency(activeResult.totalGain)],
@@ -1058,29 +1250,35 @@
         resultLines.forEach(function(row) {
             doc.setFont(undefined, 'bold');
             doc.setTextColor(90, 125, 149);
-            doc.text(row[0] + ' :', margin, y);
+            pdfText(doc, row[0] + ' :', margin, y);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(0, 119, 182);
-            doc.text(row[1], margin + 55, y);
-            y += 6;
+            pdfText(doc, row[1], margin + 50, y);
+            y += 5;
         });
-        y += 6;
+        y += 4;
 
         // ── Section: Monte Carlo Risk Analysis ──
         if (mcResults) {
-            doc.setFontSize(13);
+            doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(10, 37, 64);
-            doc.text('Analyse de risque (Monte Carlo)', margin, y);
-            y += 8;
-
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(44, 74, 94);
-
-            var mcText = 'Basee sur ' + MC_NUM_SIMS + ' simulations aleatoires avec une volatilite de ' + Math.round(profile.volatility * 100) + '% :';
-            doc.text(mcText, margin, y);
+            pdfText(doc, 'Analyse de risque (Monte Carlo)', margin, y);
             y += 6;
+
+            // Explanation paragraph
+            doc.setFontSize(7.5);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(90, 125, 149);
+            var totalInvested = state.amount + (state.contribution * 12 * state.horizon);
+            var mcExplain = 'L\'analyse Monte Carlo simule ' + MC_NUM_SIMS + ' parcours aleatoires en faisant varier le rendement selon la volatilite de votre profil ' + profile.name + ' (' + Math.round(profile.volatility * 100) + '%). Elle revele l\'eventail des issues probables plutot qu\'un seul resultat.';
+            if (state.contribution > 0) {
+                mcExplain += ' Capital de ' + formatCurrency(state.amount) + ' + contributions de ' + formatCurrency(state.contribution) + '/mois sur ' + state.horizon + ' ans.';
+            } else {
+                mcExplain += ' Capital de ' + formatCurrency(state.amount) + ' sur ' + state.horizon + ' ans.';
+            }
+            var mcExplainLines = pdfSplitAndPrint(doc, mcExplain, margin, y, contentW);
+            y += mcExplainLines.length * 3 + 3;
 
             var mcLines = [
                 ['Scenario prudent (P10)', formatCurrency(mcResults.finalP10)],
@@ -1089,17 +1287,32 @@
                 ['Probabilite de perte', Math.round(mcResults.probLoss * 100) + '%']
             ];
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             mcLines.forEach(function(row) {
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(90, 125, 149);
-                doc.text(row[0] + ' :', margin, y);
+                pdfText(doc, row[0] + ' :', margin, y);
                 doc.setFont(undefined, 'normal');
                 doc.setTextColor(10, 37, 64);
-                doc.text(row[1], margin + 55, y);
-                y += 6;
+                pdfText(doc, row[1], margin + 50, y);
+                y += 5;
             });
-            y += 6;
+            y += 2;
+
+            // Risk explanation
+            doc.setFontSize(7.5);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(90, 125, 149);
+            var probPct = Math.round(mcResults.probLoss * 100);
+            var riskExplain;
+            if (probPct === 0) {
+                riskExplain = 'Dans aucun des ' + MC_NUM_SIMS + ' scenarios, le portefeuille ne termine sous le total investi (' + formatCurrency(totalInvested) + '). La probabilite de perte sur cet horizon est tres faible.';
+            } else {
+                var nbScenarios = Math.round(probPct * MC_NUM_SIMS / 100);
+                riskExplain = 'Risque de perte (' + probPct + '%) : dans ' + nbScenarios + ' scenarios sur ' + MC_NUM_SIMS + ', le portefeuille vaudrait moins que le total investi (' + formatCurrency(totalInvested) + '). Dans ' + (100 - probPct) + '% des cas, vous recuperez votre mise avec un gain.';
+            }
+            var riskLines = pdfSplitAndPrint(doc, riskExplain, margin, y, contentW);
+            y += riskLines.length * 3 + 4;
         }
 
         // ── Section: Chart Image ──
@@ -1142,7 +1355,7 @@
                         doc.setFontSize(13);
                         doc.setFont(undefined, 'bold');
                         doc.setTextColor(10, 37, 64);
-                        doc.text('Graphique de projection', margin, y);
+                        pdfText(doc, 'Graphique de projection', margin, y);
                         y += 4;
 
                         var chartH = contentW * 0.4;
@@ -1173,7 +1386,7 @@
         doc.setFontSize(13);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(10, 37, 64);
-        doc.text('Tableau annee par annee', margin, y);
+        pdfText(doc, 'Tableau annee par annee', margin, y);
         y += 8;
 
         // Table columns
@@ -1191,7 +1404,7 @@
         doc.setFont(undefined, 'bold');
         doc.setTextColor(255, 255, 255);
         for (var h = 0; h < cols.length; h++) {
-            doc.text(cols[h], colX[h] + 2, y);
+            pdfText(doc, cols[h], colX[h] + 2, y);
         }
         y += 6;
 
@@ -1212,7 +1425,7 @@
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(255, 255, 255);
                 for (var hh = 0; hh < cols.length; hh++) {
-                    doc.text(cols[hh], colX[hh] + 2, y);
+                    pdfText(doc, cols[hh], colX[hh] + 2, y);
                 }
                 y += 6;
             }
@@ -1249,7 +1462,7 @@
             ];
 
             for (var rc = 0; rc < rowData.length; rc++) {
-                doc.text(rowData[rc], colX[rc] + 2, y);
+                pdfText(doc, rowData[rc], colX[rc] + 2, y);
             }
             y += 5;
         }
@@ -1269,7 +1482,7 @@
         doc.setFontSize(13);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(10, 37, 64);
-        doc.text('Analyse du Compas I.A.', margin, y);
+        pdfText(doc, 'Analyse du Compas I.A.', margin, y);
         y += 8;
 
         doc.setFontSize(9);
@@ -1280,8 +1493,7 @@
         var analysisText = buildAnalysisText(result, cycle, profile, mcResults);
         var plainText = analysisText.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
 
-        var splitText = doc.splitTextToSize(plainText, contentW);
-        doc.text(splitText, margin, y);
+        var splitText = pdfSplitAndPrint(doc, plainText, margin, y, contentW);
         y += splitText.length * 4.5 + 10;
 
         // ── Disclaimer + Footer ──
@@ -1299,16 +1511,15 @@
         doc.setFontSize(7.5);
         doc.setFont(undefined, 'italic');
         doc.setTextColor(160, 180, 196);
-        var disclaimer = 'Simulation a titre indicatif seulement. Les rendements passes ne garantissent pas les rendements futurs. Les resultats Monte Carlo sont bases sur des simulations aleatoires et ne constituent pas une garantie. Ce document ne constitue pas un conseil financier. Consultez un professionnel avant de prendre toute decision d\'investissement.';
-        var disclaimerLines = doc.splitTextToSize(disclaimer, contentW);
-        doc.text(disclaimerLines, margin, y);
+        var disclaimer = 'Simulation a titre indicatif seulement. Les rendements passes ne garantissent pas les rendements futurs. *Les references au S&P 500 sont fournies a titre comparatif uniquement (rendement total, dividendes reinvestis). Les resultats Monte Carlo sont bases sur des simulations aleatoires et ne constituent pas une garantie. Ce document ne constitue pas un conseil financier. Consultez un professionnel avant de prendre toute decision d\'investissement.';
+        var disclaimerLines = pdfSplitAndPrint(doc, disclaimer, margin, y, contentW);
         y += disclaimerLines.length * 3.5 + 8;
 
         doc.setFont(undefined, 'normal');
         doc.setTextColor(90, 125, 149);
         doc.setFontSize(8);
-        doc.text('Groupe Financier Ste-Foy', margin, y);
-        doc.text('418-577-2087 | groupefinancierstefoy.com', pageW - margin, y, { align: 'right' });
+        pdfText(doc, 'Groupe Financier Ste-Foy', margin, y);
+        pdfText(doc, '418-577-2087 | groupefinancierstefoy.com', pageW - margin, y, { align: 'right' });
 
         // Save
         var fileName = 'Compas-Patrimonial';
@@ -1319,6 +1530,36 @@
     }
 
     // ── Helpers ──
+
+    // Sanitize text for jsPDF (Helvetica = WinAnsiEncoding)
+    // - Removes emojis & non-BMP characters that corrupt PDF rendering
+    // - Replaces non-breaking spaces with regular spaces
+    // - Keeps accented chars (é, è, ê, à, ô etc. are supported)
+    function sanitizeForPDF(str) {
+        return str
+            // Remove emoji variation selectors & zero-width joiners
+            .replace(/[\uFE00-\uFE0F\u200D]/g, '')
+            // Remove surrogate pairs (emojis & non-BMP: 💰📈🛡️🚀🔥🌅⚖️ etc.)
+            .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+            // Remove remaining non-printable / non-Latin1 chars (keep 0x20-0xFF)
+            .replace(/[^\x20-\xFF]/g, '')
+            // Replace non-breaking spaces (U+00A0) with regular spaces
+            .replace(/\u00A0/g, ' ')
+            // Collapse multiple spaces
+            .replace(/  +/g, ' ')
+            .trim();
+    }
+
+    function pdfText(doc, text, x, y, opts) {
+        doc.text(sanitizeForPDF(text), x, y, opts);
+    }
+
+    function pdfSplitAndPrint(doc, text, x, y, maxW) {
+        var lines = doc.splitTextToSize(sanitizeForPDF(text), maxW);
+        doc.text(lines, x, y);
+        return lines;
+    }
+
     function formatCurrency(num) {
         if (num >= 1000000) {
             return (num / 1000000).toFixed(2).replace('.', ',') + ' M$';

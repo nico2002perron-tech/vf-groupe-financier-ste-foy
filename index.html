@@ -2753,6 +2753,17 @@
                             </span>
                         </div>
 
+                        <!-- Monte Carlo Toggle -->
+                        <div class="compas-toggle-group">
+                            <label class="compas-toggle">
+                                <input type="checkbox" id="compas-mc-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Analyse Monte Carlo
+                                <span class="tooltip-trigger">?<span class="tooltip-bubble">La méthode Monte Carlo est une technique utilisée en finance pour modéliser l'incertitude. Au lieu de prédire un seul résultat, elle génère 500 scénarios avec des rendements aléatoires réalistes, puis montre les résultats pessimiste (les pires 10%), médian (le milieu) et favorable (les meilleurs 10%).</span></span>
+                            </span>
+                        </div>
+
                         <!-- Risk Profile -->
                         <div class="compas-profile-group">
                             <div class="slider-label">
@@ -2806,8 +2817,15 @@
                                     <div class="subtitle" id="compas-subtitle">Projection sur 15 ans</div>
                                 </div>
                             </div>
-                            <div class="compas-chart-wrap">
+                            <div class="compas-chart-wrap" id="compas-chart-wrap">
                                 <svg id="compas-svg-chart" viewBox="0 0 600 240" preserveAspectRatio="none"></svg>
+                                <div class="chart-crosshair" id="chart-crosshair"></div>
+                                <div class="chart-hover-dot" id="chart-hover-dot"></div>
+                                <div class="chart-tooltip" id="chart-tooltip">
+                                    <div class="chart-tooltip-year"></div>
+                                    <div class="chart-tooltip-value"></div>
+                                    <div class="chart-tooltip-range"></div>
+                                </div>
                             </div>
                             <div class="goal-badge" id="goal-badge" style="display:none;">
                                 <i data-lucide="target"></i>
@@ -2833,15 +2851,80 @@
                             </div>
                         </div>
 
+                        <!-- Monte Carlo Panel -->
+                        <div class="mc-panel" id="mc-panel" style="display:none;">
+                            <div class="mc-panel-header">
+                                <i data-lucide="bar-chart-3"></i>
+                                <span>Analyse Monte Carlo</span>
+                                <small>500 scénarios simulés</small>
+                            </div>
+                            <p class="mc-explanation">L'analyse Monte Carlo simule <strong>500 parcours aléatoires</strong> de votre portefeuille en faisant varier les rendements chaque année selon la volatilité de votre profil. Elle révèle non pas un seul résultat, mais l'éventail des issues probables — du scénario pessimiste au scénario favorable.</p>
+                            <div class="mc-scenarios">
+                                <div class="mc-scenario mc-scenario--pessimist">
+                                    <div class="mc-scenario-bar">
+                                        <div class="mc-scenario-fill" id="mc-fill-p10"></div>
+                                    </div>
+                                    <div class="mc-scenario-info">
+                                        <span class="mc-scenario-label">Pessimiste</span>
+                                        <span class="mc-scenario-value" id="mc-val-p10">—</span>
+                                    </div>
+                                </div>
+                                <div class="mc-scenario mc-scenario--median">
+                                    <div class="mc-scenario-bar">
+                                        <div class="mc-scenario-fill" id="mc-fill-p50"></div>
+                                    </div>
+                                    <div class="mc-scenario-info">
+                                        <span class="mc-scenario-label">Médian</span>
+                                        <span class="mc-scenario-value" id="mc-val-p50">—</span>
+                                    </div>
+                                </div>
+                                <div class="mc-scenario mc-scenario--optimist">
+                                    <div class="mc-scenario-bar">
+                                        <div class="mc-scenario-fill" id="mc-fill-p90"></div>
+                                    </div>
+                                    <div class="mc-scenario-info">
+                                        <span class="mc-scenario-label">Favorable</span>
+                                        <span class="mc-scenario-value" id="mc-val-p90">—</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mc-risk-row">
+                                <div class="mc-risk-gauge">
+                                    <div class="mc-risk-fill" id="mc-risk-fill"></div>
+                                </div>
+                                <span class="mc-risk-label" id="mc-risk-label">0% risque de perte</span>
+                                <span class="tooltip-trigger">?<span class="tooltip-bubble">Le risque de perte représente le pourcentage des 500 scénarios simulés où votre portefeuille vaut moins que le total de vos investissements (capital initial + contributions) à la fin de l'horizon. Par exemple, 1% signifie que dans seulement 5 scénarios sur 500, vous n'auriez pas récupéré votre mise.</span></span>
+                            </div>
+                        </div>
+
                         <!-- Stats Row -->
                         <div class="compas-stats">
                             <div class="compas-stat">
                                 <div class="stat-value" id="stat-gain">143 685 $</div>
                                 <div class="stat-label">Gain projeté</div>
                             </div>
-                            <div class="compas-stat">
-                                <div class="stat-value" id="stat-return">6% — 8%</div>
-                                <div class="stat-label">Fourchette estimée</div>
+                            <div class="compas-stat compas-stat--return">
+                                <div class="stat-value stat-value--animated">
+                                    <span class="stat-num" id="stat-return-low">6</span>%
+                                    <span class="stat-separator"> — </span>
+                                    <span class="stat-num" id="stat-return-high">8</span>%
+                                </div>
+                                <div class="stat-label">
+                                    Fourchette estimée
+                                    <span class="tooltip-trigger">ⓘ
+                                        <span class="tooltip-bubble">Rendement annualisé estimé selon votre profil et le cycle actuel. Les rendements passés ne garantissent pas les rendements futurs.</span>
+                                    </span>
+                                </div>
+                                <div class="stat-sp500-compare" id="stat-benchmark">
+                                    <div class="sp500-line">
+                                        <span class="sp500-arrow sp500-arrow--hist" id="sp500-arrow-hist"></span>
+                                        <span>S&amp;P 500 ~10% <small>historique</small></span>
+                                    </div>
+                                    <div class="sp500-line">
+                                        <span class="sp500-arrow sp500-arrow--ten" id="sp500-arrow-ten"></span>
+                                        <span>S&amp;P 500 ~14% <small>(10 ans)</small></span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="compas-stat">
                                 <div class="stat-value" id="stat-alloc">65% Actions</div>
@@ -2856,6 +2939,124 @@
                     <i data-lucide="info"></i>
                     Simulation à titre indicatif seulement. Les rendements passés ne garantissent pas les rendements
                     futurs.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+     SECTION : UN FNB NE VOUS CONNAÎT PAS
+     ============================================ -->
+    <section class="advisor-advantage" id="advisor-advantage">
+        <div class="advisor-bg-orb advisor-bg-orb--1"></div>
+        <div class="advisor-bg-orb advisor-bg-orb--2"></div>
+        <div class="container">
+            <div class="advisor-header fade-in-scroll">
+                <span class="advisor-badge"><i data-lucide="shield-check"></i> Pourquoi un conseiller</span>
+                <h2 class="advisor-title-gradient">Un FNB ne vous connaît pas</h2>
+                <p>Investir seul dans un indice semble simple — jusqu'à ce que les marchés testent vos émotions, votre fiscalité et vos objectifs de vie.</p>
+                <span class="flip-progress-pill" id="flip-progress"><span id="flip-count">0</span> / 5 découverts</span>
+            </div>
+
+            <div class="flip-cards-grid">
+                <!-- Card 01 — Personnalisation -->
+                <div class="flip-card flip-card--personal fade-in-scroll delay-1" data-card-id="1">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i data-lucide="user-cog" class="flip-card-watermark"></i>
+                            <div class="flip-card-glow"></div>
+                            <span class="flip-card-number">01</span>
+                            <div class="flip-card-front-icon"><i data-lucide="user-cog"></i></div>
+                            <h3 class="flip-card-question">Votre portefeuille vous ressemble-t-il vraiment?</h3>
+                            <span class="flip-card-hint"><i data-lucide="rotate-cw" class="flip-hint-icon"></i> Cliquez pour découvrir</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-back-icon"><i data-lucide="user-cog"></i></div>
+                            <h4>Votre portefeuille, pas celui de tout le monde</h4>
+                            <p>Un indice traite tout le monde pareil. Votre conseiller connaît vos rêves, vos contraintes et vos échéances. Chaque décision est calibrée pour <strong>votre réalité</strong>.</p>
+                            <span class="flip-card-hint-back"><i data-lucide="rotate-ccw"></i> Retourner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 02 — Risque -->
+                <div class="flip-card flip-card--risk fade-in-scroll delay-2" data-card-id="2">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i data-lucide="shield-alert" class="flip-card-watermark"></i>
+                            <div class="flip-card-glow"></div>
+                            <span class="flip-card-number">02</span>
+                            <div class="flip-card-front-icon"><i data-lucide="shield-alert"></i></div>
+                            <h3 class="flip-card-question">Quand tout s'effondre, qui tient la barre?</h3>
+                            <span class="flip-card-hint"><i data-lucide="rotate-cw" class="flip-hint-icon"></i> Cliquez pour découvrir</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-back-icon"><i data-lucide="shield-alert"></i></div>
+                            <h4>Quand les marchés chutent, qui protège votre capital?</h4>
+                            <p>Un FNB subit 100% de la baisse, sans broncher. Notre gestion ajuste l'exposition quand les signaux deviennent <strong>dangereusement asymétriques</strong>.</p>
+                            <span class="flip-card-hint-back"><i data-lucide="rotate-ccw"></i> Retourner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 03 — Fiscalité -->
+                <div class="flip-card flip-card--fiscal fade-in-scroll delay-3" data-card-id="3">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i data-lucide="receipt" class="flip-card-watermark"></i>
+                            <div class="flip-card-glow"></div>
+                            <span class="flip-card-number">03</span>
+                            <div class="flip-card-front-icon"><i data-lucide="receipt"></i></div>
+                            <h3 class="flip-card-question">Combien laissez-vous au fisc sans le savoir?</h3>
+                            <span class="flip-card-hint"><i data-lucide="rotate-cw" class="flip-hint-icon"></i> Cliquez pour découvrir</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-back-icon"><i data-lucide="receipt"></i></div>
+                            <h4>Chaque dollar d'impôt économisé est un dollar investi</h4>
+                            <p>REER, CELI, compte non enregistré, société de gestion — le bon véhicule au bon moment peut valoir <strong>des milliers de dollars</strong> par année.</p>
+                            <span class="flip-card-hint-back"><i data-lucide="rotate-ccw"></i> Retourner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 04 — Émotions -->
+                <div class="flip-card flip-card--emotion fade-in-scroll delay-4" data-card-id="4">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i data-lucide="brain" class="flip-card-watermark"></i>
+                            <div class="flip-card-glow"></div>
+                            <span class="flip-card-number">04</span>
+                            <div class="flip-card-front-icon"><i data-lucide="brain"></i></div>
+                            <h3 class="flip-card-question">Et si votre pire ennemi en Bourse, c'était vous?</h3>
+                            <span class="flip-card-hint"><i data-lucide="rotate-cw" class="flip-hint-icon"></i> Cliquez pour découvrir</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-back-icon"><i data-lucide="brain"></i></div>
+                            <h4>La panique coûte plus cher que n'importe quels frais</h4>
+                            <p>En 2022, les investisseurs autonomes ont massivement vendu au creux. Résultat : ils ont transformé une baisse temporaire en <strong>perte permanente</strong>.</p>
+                            <span class="flip-card-hint-back"><i data-lucide="rotate-ccw"></i> Retourner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 05 — Planification -->
+                <div class="flip-card flip-card--planning fade-in-scroll delay-5" data-card-id="5">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i data-lucide="map" class="flip-card-watermark"></i>
+                            <div class="flip-card-glow"></div>
+                            <span class="flip-card-number">05</span>
+                            <div class="flip-card-front-icon"><i data-lucide="map"></i></div>
+                            <h3 class="flip-card-question">Avez-vous un plan... ou juste un placement?</h3>
+                            <span class="flip-card-hint"><i data-lucide="rotate-cw" class="flip-hint-icon"></i> Cliquez pour découvrir</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-back-icon"><i data-lucide="map"></i></div>
+                            <h4>Retraite, succession, assurance — le plan complet</h4>
+                            <p>Votre retraite, votre succession, vos assurances — tout est connecté. Un FNB ne planifie rien. <strong>Votre conseiller orchestre l'ensemble.</strong></p>
+                            <span class="flip-card-hint-back"><i data-lucide="rotate-ccw"></i> Retourner</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3732,7 +3933,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./js/app.js"></script>
     <script src="./js/main.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="./js/compas.js"></script>
     <script src="./js/cycle-v4.js"></script>
     <script>

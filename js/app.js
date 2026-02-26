@@ -50,6 +50,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.fade-in, .fade-in-scroll');
     animatedElements.forEach(el => observer.observe(el));
 
+    // --- Flip Cards: Click Handler + Discovery Counter ---
+    const flipCards = document.querySelectorAll('.flip-card');
+    const flipCountEl = document.getElementById('flip-count');
+    const flipPill = document.getElementById('flip-progress');
+    const discovered = new Set();
+
+    flipCards.forEach(card => {
+        card.addEventListener('click', () => {
+            card.classList.toggle('flipped');
+            const id = card.dataset.cardId;
+            if (id && !discovered.has(id)) {
+                discovered.add(id);
+                if (flipCountEl) {
+                    flipCountEl.textContent = discovered.size;
+                    // Bump animation
+                    if (flipPill) {
+                        flipPill.classList.add('counter-bump');
+                        setTimeout(() => flipPill.classList.remove('counter-bump'), 350);
+                        if (discovered.size === 5) {
+                            flipPill.classList.add('all-discovered');
+                        }
+                    }
+                }
+            }
+        });
+    });
+
     // --- Sticky Header Shadow ---
     const navbar = document.querySelector('.navbar');
     window.addEventListener('scroll', () => {
